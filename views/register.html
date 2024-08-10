@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="/register.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="main-container">
+        <form action="">
+            <div class="container">
+                <div class="heading">
+                    <h1>Sign Up</h1>
+                    <p>Enter your details below</p>
+                </div>
+
+                <!-- Username section -->
+                <label for="username" style="text-transform: capitalize;">Username</label>
+                <div class="input-container">
+                    <img src="images/person.svg" alt="icon" width="24" height="24">
+                    <input id="username" type="text" placeholder="Enter username" name="username" required>
+                </div>
+
+                <!-- Password section -->
+                <label for="password" style="text-transform: capitalize;">Password</label>
+                <div class="input-container">
+                    <img src="images/lock.svg" alt="icon" width="24" height="24">
+                    <input id="password" type="password" placeholder="Enter password" name="password" required>
+                </div>   
+            </div>
+
+            <div class="container">
+                <div class="container">
+                <!-- Login button -->
+                    <button type="submit" id="register-btn">Sign Up</button>
+                </div>
+                <div class="bottom-note">
+                    <!-- Redirect to register page -->
+                    <p>Already have an account? <a href="/login">Sign in</a></p>
+                </div>
+                <div class="error-container">
+                    <p id="error"></p>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
