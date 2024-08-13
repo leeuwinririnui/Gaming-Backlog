@@ -149,6 +149,13 @@ body {
   height: 100vh;
 }
 
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+}
+
 .main-container {
   display: flex;
   flex-direction: column;
@@ -277,6 +284,165 @@ button[type=submit]:not(#search-button):hover, button[class=logout]:hover {
   margin-top: 2.5em;
 }
 
+/* Main page */
+.main {
+  height: 100%;
+  width: 100%;
+}
+
+.search-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  padding: var(--padding-large);
+  background-color: var(--dark-bg);
+  width: 100%;
+  height: 10em;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+.links {
+  height: 2em; 
+  padding: 0 var(--padding-large); 
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 4em;
+} 
+
+
+#link {
+  font-size: var(--font-size-medium);
+  text-transform: uppercase;
+  color: var(--color-light-grey);
+  text-decoration: none;
+  font-weight: var(--font-weight-semi-bold);
+  height: 2em; 
+  cursor: pointer;
+  text-decoration: none;
+}
+
+#links:hover,
+#links:focus {
+  color: var(--color-white);
+}
+
+#search-game {
+  width: 80%;
+}
+
+#search-button {
+  cursor: pointer; /* Change cursor to pointer on hover */
+  transition: transform 0.2s, opacity 0.2s; /* Smooth transition for effects */
+}
+
+#search-button:hover,
+#search-button:focus {
+  opacity: 0.8; /* Slightly reduce opacity on hover */
+  transform: scale(1.1); /* Slightly enlarge the image on hover */
+}
+
+.games-list {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
+}
+
+.game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  gap: 2em;
+  padding: var(--padding-xxlarge);
+  border-bottom: 1px solid var(--dark-gray-accent);
+  height: auto;
+  width: 100%;
+  color: var(--color-light-grey);
+}
+
+.cover {
+  width: 12em;
+}
+
+.cover:focus,
+.cover:hover {
+  cursor: pointer;
+}
+
+.game-info {
+  font-size: var(--font-size-medium);
+}
+
+
+.game-info:hover {
+  cursor: pointer;
+  color: var(--color-white);
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--padding-large);
+  background-color: var(--dark-bg);
+  width: 100%;
+  height: 10vh;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Game info page */
+.game-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  padding: var(--padding-xlarge);
+  min-height: 90vh;
+}
+
+.game-cover {
+  width: 28em;
+}
+
+.info-cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: start;
+  width: 100%;
+  height: 100%;
+}
+
+.info-section {
+  padding: var(--padding-xxlarge);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.title {
+  color: var(--color-white);
+  font-size: var(--font-size-xlarge);
+}
+
+.info-description {
+  padding: var(--padding-large) 0;
+}
+
+.description {
+  color: var(--color-light-grey);
+  font-size: var(--font-size-medium);
+}
+
 @media (min-width: 50em) {
   .main-container {
     padding: var(--padding-xxlarge);
@@ -312,61 +478,68 @@ button[type=submit]:not(#search-button):hover, button[class=logout]:hover {
     word-wrap: break-word; /* This will break long words to fit the container */
     overflow-wrap: break-word; /* Ensures long words break to the next line */
   }
+
+  .cover {
+    width: 18em;
+  }
+
+  .games-list {
+    align-items: center;
+
+  }
+
+  .game {
+    gap: 4em;
+    padding: var(--padding-xxlarge);
+    border-right: 1px solid var(--dark-gray-accent);
+    border-left: 1px solid var(--dark-gray-accent);
+    width: 40em;
+  }
+  
+  .search-container {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 5em;
+    padding: var(--padding-xxlarge);
+  }
+
+  .game-container {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 5em;
+    padding: var(--padding-xxlarge);
+  }
+
+  .links {
+    width: 50%;
+  }
+
+  .info-cover {
+    justify-content: center;
+    width: 50%;
+  }
+  
+  .info-section {
+    width: 50%;
+  }
+
+  .game-details {
+    border: 2px solid red;
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    padding: var(--padding-xxxlarge);
+    width: 90em;
+  }
+  
+  .info-section {
+    align-items: start;
+    justify-content: start;
+  }
 }
 
-/* Main page */
-.main {
-  height: 100%;
-  width: 100%;
-}
 
-.search-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: start;
-  padding: var(--padding-large);
-  background-color: var(--dark-bg);
-  width: 100%;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-}
-
-
-#links {
-  border-radius: 25px; /* Rounded corners to match input-container */
-  border: none;
-  font-size: var(--font-size-medium);
-  text-transform: uppercase;
-  color: var(--color-light-grey);
-  text-decoration: none;
-  font-weight: var(--font-weight-semi-bold);
-  height: 3.5em; /* Matches the height of inputs */
-  padding: 0 var(--padding-medium); /* Consistent padding */
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-#links:hover,
-#links:focus {
-  color: var(--color-white);
-}
-
-#search-game {
-  width: 80%;
-}
-
-#search-button {
-  cursor: pointer; /* Change cursor to pointer on hover */
-  transition: transform 0.2s, opacity 0.2s; /* Smooth transition for effects */
-}
-
-#search-button:hover,
-#search-button:focus {
-  opacity: 0.8; /* Slightly reduce opacity on hover */
-  transform: scale(1.1); /* Slightly enlarge the image on hover */
-}
 

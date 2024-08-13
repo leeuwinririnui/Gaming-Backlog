@@ -18,4 +18,8 @@ router.get('/register', verifyAuth, (req, res) => {
     res.sendFile(path.join(__dirname, '..', '..', 'views', 'register.html'));
 });
 
+router.get('/game', userAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, '..', '..', 'views', 'game.html'));
+});
+
 module.exports = router;

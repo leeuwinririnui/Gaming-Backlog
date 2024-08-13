@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Games</title>
-    <script src="/search.js"></script>
+    <title>Game Info</title>
+    <script src="/info.js"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,21 +20,25 @@
     
 
         <div class="main">
-            <div class="search-container">
+            <div class="game-container" style="border: 2px solid blue;">
                 <div class="links">
                     <a id="link" href="#">My List</a>
+                    <a id="link" href="/">Search</a>
                     <a id="link" href="/logout">Logout</a>
                 </div>
-                <form id="search-form" action="/search" method="get"></form>
-                    <div class="input-container">
-                        <input id="search-game" type="search" placeholder="Search a game...">
-                        <img id="search-button" src="images/search.svg" alt="search-icon" width="24" height="24">
-                    </div>
-                </form>
             </div>
-            <div id="games-list" class="games-list">
-                <!-- Games will be show here -->
-
+            <div class="game-details" style="border: 2px solid red;">
+                <div class="info-cover" style="border: 2px solid blue;">
+                    <img class ="game-cover" alt="">
+                </div>
+                <div class="info-section" style="border: 2px solid blue;">
+                    <div class="info-title">
+                        <p class="title"></p>
+                    </div>
+                    <div class="info-description">
+                        <p class="description"></p>
+                    </div>
+                </div>
             </div>
         </div>
 
