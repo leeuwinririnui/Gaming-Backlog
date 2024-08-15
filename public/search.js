@@ -96,7 +96,7 @@ async function getGameData() {
                         gamesList.appendChild(newGame);
                     }
                 });
-                // Add event listener to each game
+                // Add redirect event listener to each game
                 gamePage();
 
             } else {

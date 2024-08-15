@@ -36,7 +36,6 @@ const fetchGame = async ( req, res, next) => {
 
 // Function to retrieve game information based on game ID
 const gamePage = async (req, res, next) => {
-    console.log('fag')
     // Extract id from req query
     const { id } = req.query;
 

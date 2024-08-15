@@ -20,24 +20,43 @@
     
 
         <div class="main">
-            <div class="game-container" style="border: 2px solid blue;">
+            <div class="game-container">
                 <div class="links">
                     <a id="link" href="#">My List</a>
                     <a id="link" href="/">Search</a>
                     <a id="link" href="/logout">Logout</a>
                 </div>
             </div>
-            <div class="game-details" style="border: 2px solid red;">
-                <div class="info-cover" style="border: 2px solid blue;">
+            <div class="game-details">
+                <div class="info-cover">
                     <img class ="game-cover" alt="">
+                    <div class="sample-screenshots">
+
+                    </div>
                 </div>
-                <div class="info-section" style="border: 2px solid blue;">
+                <div class="info-section">
+                    <div class="info-score">
+                        <p class="score">Moby Score: </p>
+                        <p class="votes">Votes: </p>
+                    </div>
                     <div class="info-title">
                         <p class="title"></p>
                     </div>
-                    <div class="info-description">
+                    <p class="heading">Description:</p>
+                    <div class="info-description"> 
+                        <!--Filled using JS  -->
                         <p class="description"></p>
                     </div>
+                    <p class="heading">Genre:</p>
+                    <div class="info-genre">
+                        <!-- Filled using JS -->
+                    </div>
+                </div>
+                <!-- Button to add game to users backglog/list -->
+                <div class="button-section">
+                    <button type="submit" id="add-btn">Add to List</button>
+ 
+
                 </div>
             </div>
         </div>

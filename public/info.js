@@ -31,14 +31,42 @@ async function getGameInfo() {
     // Check if game exists
     if (game) {
         const { 
-            title, description, sample_cover, moby_score, num_votes
+            title, description, sample_cover, moby_score, num_votes, sample_screenshots, genres
          } = game;
 
-         console.log(game);
+        console.log(game);
+         
+        document.querySelector('.game-cover').src = sample_cover.image;
+        document.querySelector('.title').innerHTML = `${title}`;
+        document.querySelector('.description').innerHTML = `${description}`;
+        document.querySelector('.score').innerHTML += `${moby_score}`;
+        // Uses different classes depending on the score of game
+        if (moby_score >= 7) {
+            document.querySelector('.score').classList.replace('score', 'score-good');
+        } else if (moby_score <= 7 && moby_score >= 4) {
+            document.querySelector('.score').classList.replace('score', 'score-av');
+        } else {
+            document.querySelector('.score').classList.replace('score', 'score-bad');
+        }
+        document.querySelector('.votes').innerHTML += `${num_votes}`;
 
-         document.querySelector('.game-cover').src = sample_cover.image;
-         document.querySelector('.title').innerHTML = `${title}`;
-         document.querySelector('.description').innerHTML = `${description}`;
+        // Retrieve screen shots from sample_screenshots array
+        sample_screenshots.forEach(screen => {
+            const shot = document.createElement('img');
+            shot.classList.add('screenshot');
+            shot.src = screen.thumbnail_image;
+            console.log(screen);
+            document.querySelector('.sample-screenshots').appendChild(shot);
+        });
+
+        // Retrieve genres from genres array
+        genres.forEach(gameGenre => {
+            const genre = document.createElement('p');
+            genre.classList.add('genre');
+            genre.innerHTML = gameGenre.genre_name;
+            document.querySelector('.info-genre').appendChild(genre);
+        });
+
     } else {
         // Add HTML for error as well
 
