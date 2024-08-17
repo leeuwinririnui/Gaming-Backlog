@@ -1,5 +1,5 @@
 // Import User model
-const User = require('../data/user');
+const User  = require('../data/user');
 
 const path = require('path');
 
@@ -9,7 +9,7 @@ const bcrypt = require('bcrypt');
 // Import JsonWebToken
 const jwt = require('jsonwebtoken');
 
-// Secret string
+// Secret key
 const jwtSecret = '7184a7e0aa374816e3ffea4f11dc52321c9c89591b198e2084c15aab74ea9de57e3771s';
 
 const maxAge = 4 * 60 * 60;
@@ -71,6 +71,8 @@ const register = async (req, res, next) => {
             message: "User successfully created",
             username: user,
         });
+        
+        sessionStorage.setItem("user_id", user.id);
 
     // Send 401 Unauthorized response
     } catch (err) {
@@ -124,6 +126,8 @@ const login = async (req, res, next) => {
             message: "Login successful",
             user,
         });
+
+        
 
     } catch(error) {
         res.status(400).json({
@@ -258,7 +262,7 @@ const userAuth = (req, res, next) => {
     } else {
         return res
             .status(401)
-            .sendFile(path.join(__dirname, '..', '..', 'views', 'unauthorized.html'));
+            .sendFile(path.join(__dirname, '..', '..', 'views', 'login.html'));
     }
 }
 

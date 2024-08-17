@@ -19,6 +19,7 @@ const UserSchema = new Mongoose.Schema({
         default: "basic",
         required: true,
     },
+    games: [String], // Array of string id's
 });
 
 // Create User model

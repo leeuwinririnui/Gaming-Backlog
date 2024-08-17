@@ -8,7 +8,7 @@ const params = new URLSearchParams(url.search);
 const gameId = params.get('id');
 
 // Encode id
-const encodedId = encodeURIComponent(gameId)
+const encodedId = encodeURIComponent(gameId);
 
 // Function to retrieve relevant game information
 async function getGameInfo() {
@@ -18,7 +18,7 @@ async function getGameInfo() {
     });
 
     if (!res.ok) {
-        console.error('Failed to retrieve game data');
+        console.error(await res.json());
     }
 
     const data = await res.json();
@@ -33,6 +33,7 @@ async function getGameInfo() {
         const { 
             title, description, sample_cover, moby_score, num_votes, sample_screenshots, genres
          } = game;
+
 
         console.log(game);
          
@@ -74,6 +75,86 @@ async function getGameInfo() {
     }
 }
 
+async function addGameToList() {
+    const res = await fetch(`api/game/add?id=${gameId}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' }
+    });
+
+    if (!res.ok) {
+        console.error(await res.json());
+
+        return;
+    } else {
+        console.reload(await res.json());
+    }
+}
+
+async function removeGameFromList() {
+    const res = await fetch(`api/game/remove?id=${gameId}`, {
+        method: 'GET',
+        headers: { 'content-type': 'application/json' }
+    });
+
+    if (!res.ok) {
+        console.log()
+    }
+
+    const data = await res.json();
+
+    console.log(data.message);
+}
+
+async function determineButton() {
+    const res = await fetch(`api/game/check?id=${gameId}`, {
+        method: 'GET',
+        headers: { 'content-type': 'application/json' }
+    });
+
+    if (!res.ok) {
+        console.log();
+    }
+
+    const data = await res.json()
+
+    console.log(data.message)
+
+    const button = document.createElement('button');
+
+    button.id = 'list-btn';
+
+    button.type = 'submit';
+
+    if (data.message == "True") {
+
+        button.classList.add('remove-btn');
+
+        button.classList.remove('add-btn');
+
+        button.innerHTML = `Remove from List`;
+
+        button.addEventListener(('click'), () => {
+            removeGameFromList();
+        });
+
+        document.querySelector('.button-section').append(button);
+    } else {
+        button.classList.add('add-btn');
+
+        button.classList.remove('remove-btn');
+
+        button.innerHTML = `Add to List`;
+
+        button.addEventListener(('click'), () => {
+            addGameToList();
+        });
+
+        document.querySelector('.button-section').append(button);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    determineButton();
     getGameInfo();
 });
+
