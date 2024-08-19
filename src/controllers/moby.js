@@ -9,9 +9,10 @@ const jwtSecret = '7184a7e0aa374816e3ffea4f11dc52321c9c89591b198e2084c15aab74ea9
 
 // Import User model
 const User = require('../data/user');
+const { response } = require('express');
 
 // GET request to mobygames api
-const fetchGame = async ( req, res, next) => {
+const fetchGame = async (req, res, next) => {
     // Retrieve title from query
     const { title } = req.query;
 
@@ -123,6 +124,44 @@ const addGame = async (req, res, next) => {
     }
 }
 
+const removeGame = async (req, res, next) => {
+    // Retrieve game id from query parameter
+    const game_id = req.query.id;
+
+    // Retrieve users id from request headers
+    const token = req.cookies.jwt;
+
+    // Decode token
+    const decoded = jwt.verify(token, jwtSecret);
+
+    // Retrieve user id from decoded token
+    const user_id = decoded.id;
+
+    try {
+        // Retrieve user from db
+        const user = await User.findById(user_id);
+
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+
+        if (user.games.includes(game_id)) {
+            console.log("Im here")
+            await User.findByIdAndUpdate(
+                user_id,
+                 { $pull: { games: game_id } },
+            );
+        } else {
+            return res.status(404).json({ message: "Game was not found in users list" });
+        }
+
+        return res.status(200).json({ message: "Game successfully removed from list" });
+
+    } catch (error) {
+        return res.status(500).json({ message: 'Error update user games:', error });
+    }
+}
+
 const checkGame = async (req, res, next) => {
     // Retrieve game id from query parameter
     const game_id = req.query.id;
@@ -158,40 +197,41 @@ const checkGame = async (req, res, next) => {
     }
 }
 
-const removeGame = async (req, res, next) => {
-    // Retrieve game id from query parameter
-    const game_id = req.query.id;
-
-    // Retrieve users id from request headers
+// Function to fetch users backglog
+const fetchBacklog = async (req, res, next) => {
     const token = req.cookies.jwt;
 
-    // Decode token
-    const decoded = jwt.verify(token, jwtSecret);
-
-    // Retrieve user id from decoded token
-    const user_id = decoded.id;
-
     try {
-        // Retrieve user from db
-        const user = await User.findById(user_id);
+        const decoded = jwt.verify(token, jwtSecret);
 
-        if (!user) {
-            return res.status()
-        }
+        const user_id = decoded.id;
 
-        if (user.games.includes(game_id)) {
-            await user.findByIdAndUpdate(
-                user_id,
-                 { remove : { games : gameId } },
-            );
-        } else {
-            return res.status(404).json({ message: "Game was not found in users list" });
-        }
+        // Retrieve user object using users id
+        const user = await User.findById(user_id)
 
-        return res.status(200).json({ message: "Game successfully removed from list" });
+        // Array to hold game ids from user's backlog
+        const game_ids = user.games;
 
+        // Array to hold endpoints for fetching game data
+        let endpoints = "";
+
+        game_ids.forEach(game_id => endpoints += `&id=${encodeURIComponent(game_id)}`);
+
+        const url = `${endpoint}?api_key=${apiKey}` + endpoints;
+
+        console.log(endpoints);
+
+        console.log(url);
+
+        const response =  await fetch(url);
+
+        const data = await response.json();
+
+        console.log(data);
+
+        return res.status(200).json(data);
     } catch (error) {
-        return res.status(500).json({ Error: error });
+        return res.status(500).json({ message: "Error: ", error });
     }
 }
 
@@ -200,5 +240,6 @@ module.exports = {
     gamePage, 
     addGame,
     checkGame,
-    removeGame 
+    removeGame, 
+    fetchBacklog 
 };

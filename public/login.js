@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return display.textContent;
             }
             
-            // Redirect user based on role
+            // Redirect user to home page
             location.assign('/');
         } catch (err) {
             display.textContent = 'An unexpected error occurred. Please try again.';

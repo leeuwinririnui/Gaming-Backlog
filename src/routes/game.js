@@ -3,7 +3,7 @@ const express = require('express');
 
 const router = express.Router();
 
-const { fetchGame, gamePage, addGame, checkGame, removeGame } = require("../controllers/moby");
+const { fetchGame, gamePage, addGame, checkGame, removeGame, fetchBacklog } = require("../controllers/moby");
 
 // Route handlers
 
@@ -21,6 +21,9 @@ router.route("/check").get(checkGame);
 
 // Remove game from users list
 router.route("/remove").get(removeGame);
+
+// Fetch users list of games to display
+router.route("/backlog").get(fetchBacklog);
 
 // Exports routes
 module.exports = router;

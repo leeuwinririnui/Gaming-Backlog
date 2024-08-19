@@ -26,4 +26,8 @@ router.get('/game', userAuth, (req, res) => {
     res.sendFile(path.join(__dirname, '..', '..', 'views', 'game.html'));
 });
 
+router.get('/list', userAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, '..', '..', 'views', 'list.html'));
+});
+
 module.exports = router;

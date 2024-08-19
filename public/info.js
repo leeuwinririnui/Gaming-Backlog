@@ -82,12 +82,16 @@ async function addGameToList() {
     });
 
     if (!res.ok) {
-        console.error(await res.json());
 
         return;
-    } else {
-        console.reload(await res.json());
     }
+    
+    const data = await res.json();
+
+    console.log(data.message);
+
+    window.location.reload();
+    
 }
 
 async function removeGameFromList() {
@@ -103,6 +107,8 @@ async function removeGameFromList() {
     const data = await res.json();
 
     console.log(data.message);
+
+    window.location.reload();
 }
 
 async function determineButton() {
