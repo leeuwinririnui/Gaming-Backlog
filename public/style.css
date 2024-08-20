@@ -427,12 +427,11 @@ button[type=submit]:not(#search-button):hover, button[class=logout]:hover {
   margin-top: 1em;
   gap: 0.5em;
   overflow: auto;
-  min-height: 12em;
 }
 
 .screenshot {
-  height: 10em;
-  width: auto;
+  width: 12em;
+  height: auto;
   border: 2px solid var(--dark-bg);
   border-radius: 6px;
 }

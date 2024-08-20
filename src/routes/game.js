@@ -3,14 +3,14 @@ const express = require('express');
 
 const router = express.Router();
 
-const { fetchGame, gamePage, addGame, checkGame, removeGame, fetchBacklog } = require("../controllers/moby");
+const { fetchGame, gamePage, addGame, checkGame, removeGame, fetchBacklog, searchList } = require("../controllers/moby");
 
 // Route handlers
 
-// Retrieve game information for list
+// Retrieve games based on search
 router.route("/retrieve").get(fetchGame);
 
-// Retrieve game information from dedicated page
+// Retrieve game information for dedicated page
 router.route("/info").get(gamePage);
 
 // Add game to users backlog
@@ -24,6 +24,9 @@ router.route("/remove").get(removeGame);
 
 // Fetch users list of games to display
 router.route("/backlog").get(fetchBacklog);
+
+// Filter users list based on searched title
+router.route("/search").get(searchList);
 
 // Exports routes
 module.exports = router;

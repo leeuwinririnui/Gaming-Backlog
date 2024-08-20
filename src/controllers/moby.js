@@ -9,7 +9,6 @@ const jwtSecret = '7184a7e0aa374816e3ffea4f11dc52321c9c89591b198e2084c15aab74ea9
 
 // Import User model
 const User = require('../data/user');
-const { response } = require('express');
 
 // GET request to mobygames api
 const fetchGame = async (req, res, next) => {
@@ -35,6 +34,7 @@ const fetchGame = async (req, res, next) => {
         
         // Convert response to JSON format
         const data = await response.json();
+
         console.log(data);
 
         res.json(data);
@@ -235,11 +235,31 @@ const fetchBacklog = async (req, res, next) => {
     }
 }
 
+const searchList = async (req, res, next) => {
+    const token = req.cookies.token;
+
+    try {
+        const decoded = jwt.verify(token, jwtSecret);
+
+        const user_id = decoded.id;
+
+        // Retrieve user object using users id
+        const user = await User.findById(user_id)
+
+        // Array to hold game ids from user's backlog
+        const game_ids = user.games;
+
+    } catch (error) {
+        
+    }
+}
+
 module.exports = { 
     fetchGame, 
     gamePage, 
     addGame,
     checkGame,
     removeGame, 
-    fetchBacklog 
+    fetchBacklog,
+    searchList 
 };

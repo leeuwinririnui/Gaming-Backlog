@@ -1,42 +1,46 @@
 document.addEventListener('DOMContentLoaded', () =>{
+    // Empty search
+    document.querySelector('#search-game').value = "";
+    
     const searchButton = document.querySelector('#search-button');
     const searchInput = document.querySelector('#search-game');
-    let timeoutID;
 
     // Fetch game data when search icon is clicked
     searchButton.addEventListener('click', () => {
         getGameData();
     });
 
-    // Fetch game data after user type input (half a second delay)
-    if (searchInput) {
-        searchInput.addEventListener('input', () => {
-            // Clear the previous timeout
-            clearTimeout(timeoutID);
+    searchInput.addEventListener('keypress', (event) => {
+        // If the user presses the "Enter" key on the keyboard
+        if (event.key === "Enter") {
+            // Cancel the default action
+            event.preventDefault();
 
-            // Set new timeout
-            timeoutID = setTimeout(() => {
-                getGameData();
-            }, 500);
-        });
-    }   
+            // Trigger search button with click
+            searchButton.click();
+        }
+    });
 });
 
 // Function to retrieve game data
 async function getGameData() {
     const searchInput = document.querySelector('#search-game');
     const games_list = document.querySelector('#games-list');
+    const searchTitle = document.querySelector('#search-results');
     // Retrieve game title from users entered value
     const title = searchInput.value.trim();
+
+    // Add search content to h3
+    searchTitle.innerHTML = `Search Results for "<strong>${title}</strong>"`;
 
     // Clear list of games if no input 
     if (!title) {
         games_list.innerHTML = '';
     } else {
+        // Encode title to make URL safe
+        const encodedTitle = encodeURIComponent(title);
         
         try {
-            // Encode title to make URL safe
-            const encodedTitle = encodeURIComponent(title);
 
             // Send request to server with game title
             const res = await fetch(`api/game/retrieve?title=${encodedTitle}`, {
@@ -51,9 +55,6 @@ async function getGameData() {
             const data = await res.json(); 
 
             console.log(data);
-
-            // Clear games list from previous search
-            games_list.innerHTML = '';
             
             if (Array.isArray(data.games)) {
                 games_list.innerHTML = '';
@@ -63,6 +64,7 @@ async function getGameData() {
                         const gameCover = game.sample_cover.image;
                         const gameTitle = game.title;
                         const gameId = game.game_id;
+                        const releaseDate = game.platforms[0].first_release_date;
 
                         // Create new elements for each game
                         const newGame = document.createElement('div');  
@@ -70,6 +72,7 @@ async function getGameData() {
                         const newImage = document.createElement('img');
                         const newInfo = document.createElement('div');
                         const newTitle = document.createElement('p');
+                        const newDate = document.createElement('p');
                         
                         // Add attributes
                         newGame.classList.add('game');
@@ -83,6 +86,8 @@ async function getGameData() {
                         newInfo.classList.add('game-info');
                         newTitle.classList.add('game-title');
                         newTitle.innerHTML = `${gameTitle}`;
+                        newDate.classList.add('release-date');
+                        newDate.innerHTML = `Release Date: <strong>${releaseDate}<strong>`
                         // Add game id to be custom data attribute
                         newTitle.dataset.gameId = String(gameId);
                         newImage.dataset.gameId = String(gameId);
@@ -91,6 +96,7 @@ async function getGameData() {
                         newCover.appendChild(newImage);
                         newGame.appendChild(newCover);
                         newInfo.appendChild(newTitle);
+                        newInfo.appendChild(newDate);
                         newGame.appendChild(newInfo);
                         games_list.appendChild(newGame);
                     }

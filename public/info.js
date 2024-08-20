@@ -51,22 +51,25 @@ async function getGameInfo() {
         }
         document.querySelector('.votes').innerHTML += `${num_votes}`;
 
-        // Retrieve screen shots from sample_screenshots array
-        sample_screenshots.forEach(screen => {
-            const shot = document.createElement('img');
-            shot.classList.add('screenshot');
-            shot.src = screen.thumbnail_image;
-            console.log(screen);
-            document.querySelector('.sample-screenshots').appendChild(shot);
-        });
-
-        // Retrieve genres from genres array
-        genres.forEach(gameGenre => {
-            const genre = document.createElement('p');
-            genre.classList.add('genre');
-            genre.innerHTML = gameGenre.genre_name;
-            document.querySelector('.info-genre').appendChild(genre);
-        });
+        // Retrieve screen shots from sample_screenshots array if array is not empty
+        if (sample_screenshots.length) {
+            sample_screenshots.forEach(screen => {
+                const shot = document.createElement('img');
+                shot.classList.add('screenshot');
+                shot.src = screen.image;
+                console.log(screen);
+                document.querySelector('.sample-screenshots').appendChild(shot);
+            });
+        }
+        // Retrieve genres from genres array if array is not empty
+        if (genres) {
+            genres.forEach(gameGenre => {
+                const genre = document.createElement('p');
+                genre.classList.add('genre');
+                genre.innerHTML = gameGenre.genre_name;
+                document.querySelector('.info-genre').appendChild(genre);
+            });
+        }
 
     } else {
         // Add HTML for error as well
