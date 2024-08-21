@@ -1,3 +1,5 @@
+var stringSimilarity = require("string-similarity");
+
 const apiKey = 'moby_9cJw7yCmRazpm4HboHgRCSUCmMZ';
 const endpoint = 'https://api.mobygames.com/v1/games';
 
@@ -209,6 +211,11 @@ const fetchBacklog = async (req, res, next) => {
         // Retrieve user object using users id
         const user = await User.findById(user_id)
 
+        // Check if user exists
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
         // Array to hold game ids from user's backlog
         const game_ids = user.games;
 
@@ -236,7 +243,11 @@ const fetchBacklog = async (req, res, next) => {
 }
 
 const searchList = async (req, res, next) => {
-    const token = req.cookies.token;
+    const token = req.cookies.jwt;
+
+    const { title } = req.query;
+
+    console.log(`Yo this is the ${title}`);
 
     try {
         const decoded = jwt.verify(token, jwtSecret);
@@ -246,13 +257,76 @@ const searchList = async (req, res, next) => {
         // Retrieve user object using users id
         const user = await User.findById(user_id)
 
+        // Check if user exists
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
         // Array to hold game ids from user's backlog
         const game_ids = user.games;
 
-    } catch (error) {
+        // Array to hold endpoints for fetching game data
+        let endpoints = "";
+
+        game_ids.forEach(game_id => endpoints += `&id=${encodeURIComponent(game_id)}`);
+
+        const url = `${endpoint}?api_key=${apiKey}` + endpoints;
+
+        console.log(`Constructed URL: ${url}`);
+
+        const response =  await fetch(url);
+
+        if (!response.ok) {
+            return res.status(400).json({ message: 'User not found' });
+        }
+
+        const data = await response.json();
+
+        // Match titles with games in users list
+        const game_titles = await matchTitles(data.games, title);
+
+        // Return games with titles that matched
+        endpoints = "";
+
+        let filtered_games = { games: [] };
         
+        // OPTIMIZE!!
+        data.games.forEach(game => {
+            let match = false;
+            game_titles.forEach(title => {
+                if (game.title === title) {
+                    match = true;
+                }
+            });
+
+            if (match === true) {
+                filtered_games.games.push(game);
+            }
+        });
+
+        console.log(filtered_games);
+
+        return res.status(200).json(filtered_games);
+    } catch (error) {
+        return res.status(500).json({ message: "Error:", error });
     }
 }
+
+// Function to match searched title with games in list
+async function matchTitles(games, title) {
+    let titles = [];
+
+    games.forEach(game => {
+        if (stringSimilarity.compareTwoStrings(game.title, title) > 0.25) {
+            titles.push(game.title);
+        }   
+        
+    });
+
+    return titles;
+}
+
+// Function to 
 
 module.exports = { 
     fetchGame, 
