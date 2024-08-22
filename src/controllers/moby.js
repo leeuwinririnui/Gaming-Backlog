@@ -1,4 +1,5 @@
-var stringSimilarity = require("string-similarity");
+// Import helper functions
+const { filterGamesByTitle, matchTitles } = require('./helper.js')
 
 const apiKey = 'moby_9cJw7yCmRazpm4HboHgRCSUCmMZ';
 const endpoint = 'https://api.mobygames.com/v1/games';
@@ -282,27 +283,9 @@ const searchList = async (req, res, next) => {
 
         const data = await response.json();
 
-        // Match titles with games in users list
-        const game_titles = await matchTitles(data.games, title);
+        const titles = await matchTitles(data.games, title);
 
-        // Return games with titles that matched
-        endpoints = "";
-
-        let filtered_games = { games: [] };
-        
-        // OPTIMIZE!!
-        data.games.forEach(game => {
-            let match = false;
-            game_titles.forEach(title => {
-                if (game.title === title) {
-                    match = true;
-                }
-            });
-
-            if (match === true) {
-                filtered_games.games.push(game);
-            }
-        });
+        const filtered_games = await filterGamesByTitle(data.games, titles);
 
         console.log(filtered_games);
 
@@ -310,20 +293,6 @@ const searchList = async (req, res, next) => {
     } catch (error) {
         return res.status(500).json({ message: "Error:", error });
     }
-}
-
-// Function to match searched title with games in list
-async function matchTitles(games, title) {
-    let titles = [];
-
-    games.forEach(game => {
-        if (stringSimilarity.compareTwoStrings(game.title, title) > 0.25) {
-            titles.push(game.title);
-        }   
-        
-    });
-
-    return titles;
 }
 
 // Function to 

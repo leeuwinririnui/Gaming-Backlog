@@ -1,3 +1,5 @@
+let devidedGames;
+
 document.addEventListener('DOMContentLoaded', () => {
     getUserList();
     filterBySearch();
@@ -25,28 +27,34 @@ function filterBySearch() {
 }
 
 async function getGameData(title) {
-    console.log(`${title} is here`);
-
     if (title === "") {
         getUserList();
         return;
     }
     // Allow user to search for games in list
-    const games_list = document.querySelector('#games-list');
+    const gamesList = document.querySelector('#games-list');
 
     // Encoded title for URI
     const encodedTitle = encodeURIComponent(title);
 
     try {
 
-        const response = await fetch(`api/game/search?title=${encodedTitle}`, {
+        const res = await fetch(`api/game/search?title=${encodedTitle}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json'}
         });
 
-        const data = await response.json();
+        if (!res.ok) { 
+            console.error('Failed to retrieve game data');
+        }
 
-        populateList(data.games, games_list);
+        const data = await res.json();
+
+        devidedGames = devideList(data.games);
+
+        addPaginationLinks(devidedGames.length);
+
+        populateList(devidedGames[0].games, gamesList);
     } catch (error) {
         console.error(error);
     }
@@ -54,7 +62,7 @@ async function getGameData(title) {
 
 async function getUserList() {
     // Allow user to search for games in list
-    const games_list = document.querySelector('#games-list');
+    const gamesList = document.querySelector('#games-list');
 
     try {
         const res = await fetch(`api/game/backlog`, {
@@ -68,7 +76,13 @@ async function getUserList() {
 
         const data = await res.json();
 
-        populateList(data.games, games_list);
+        devidedGames = devideList(data.games);
+
+        console.log(devidedGames.games)
+
+        addPaginationLinks(devidedGames.length);
+
+        populateList(devidedGames[0].games, gamesList);
 
         
     } catch (error) {
@@ -76,8 +90,131 @@ async function getUserList() {
     }
 }
 
+// Redirect user to game info page
+function toGameInfoPage() {
+    // Function to handle the redirection
+    const handleRedirect = (event) => {
+        // Retrieve game id from custom data attribute
+        const gameId = event.target.dataset.gameId;
+        // Redirect user to information page passing game id as parameter
+        window.location.href = `/game?id=${gameId}`;
+    };
+
+    // Select all titles and game covers from document
+    const gameElements = document.querySelectorAll('.game-title, .game-cover');
+
+    // Add event listener to clickable image and title
+    gameElements.forEach(element => {
+        element.addEventListener('click', handleRedirect);
+    });
+}
+
+// OPTIMIZE!!!
+// Function to devide list into array the size of n elements
+function devideList(games) {
+    let dividedGames = [];
+    let temp = { games: [] };
+    let count = 0;
+
+    games.forEach(game => {
+        if (count === 15) {
+            dividedGames.push(temp);
+            temp = { games: [] };
+            count = 0;
+        }
+        
+        temp.games.push(game);
+        count++;
+    });
+
+    // Push any remaining games
+    dividedGames.push(temp);
+    
+    return dividedGames;
+}
+
+// OPTIMIZE!!!
+// Function to add pagination links with event listeners to document
+function addPaginationLinks(length) {
+    const gamesList = document.querySelector('#games-list');
+    const paginationContainer = document.querySelector('.pagination');
+    paginationContainer.innerHTML = '';
+
+    for (let i = 0; i < length; i++) {
+        const pagination_link = document.createElement('a');
+        pagination_link.innerHTML = `${i+1}`;
+        if (i === 0) { pagination_link.classList.add('active'); }
+        if (i >= 1 && i <= 4) { 
+            pagination_link.classList.add('sibling');
+        }
+
+        pagination_link.addEventListener('click', () => {
+            populateList(devidedGames[i].games, gamesList);
+
+            // Move the screen position to the top after execution stack is clear
+            setTimeout(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 0);
+
+            const links = paginationContainer.querySelectorAll('a');
+
+            links.forEach(link => {
+                link.classList.remove('active');
+                link.classList.remove('sibling');
+            });
+
+            pagination_link.classList.add('active');
+
+            // Add sibling links to active link
+            if (pagination_link.previousElementSibling) {
+                pagination_link.previousElementSibling.classList.add('sibling');
+            } 
+
+            if (pagination_link.previousElementSibling.previousElementSibling) {
+                pagination_link.previousElementSibling.previousElementSibling.classList.add('sibling');
+            } else {
+                pagination_link.nextElementSibling.nextElementSibling.classList.add('sibling');
+                pagination_link.nextElementSibling.nextElementSibling.nextElementSibling.classList.add('sibling');
+            }
+        
+            if (pagination_link.nextElementSibling) {
+                pagination_link.nextElementSibling.classList.add('sibling');
+            } 
+
+            if (pagination_link.nextElementSibling.nextElementSibling) {
+                pagination_link.nextElementSibling.nextElementSibling.classList.add('sibling');
+            } else {
+                pagination_link.previousElementSibling.previousElementSibling.classList.add('sibling');
+                pagination_link.previousElementSibling.previousElementSibling.previousElementSibling.classList.add('sibling');
+            }
+
+            // Hide links that are not active or siblings
+            links.forEach(link => {
+               link.style.display = link.classList.contains('active') || link.classList.contains('sibling')
+                    ? 'inline-block'
+                    : 'none';
+            });
+        });
+
+    paginationContainer.appendChild(pagination_link);
+    }
+
+    const links = paginationContainer.querySelectorAll('a');
+
+    links.forEach(link => {
+        link.style.display = link.classList.contains('active') || link.classList.contains('sibling')
+            ? 'inline-block'
+            : 'none';
+     });
+}
+
+
+
+
+
+// KEEP AT BOTTOM!!
 // Function to populate list
-async function populateList(games, list) {
+function populateList(games, list) {
     if (Array.isArray(games)) {
         list.innerHTML = '';
         games.forEach(game => {
@@ -146,23 +283,4 @@ async function populateList(games, list) {
     } else {
         console.error("Invalid data format");
     }
-}
-
-// Redirect user to game info page
-function toGameInfoPage() {
-    // Function to handle the redirection
-    const handleRedirect = (event) => {
-        // Retrieve game id from custom data attribute
-        const gameId = event.target.dataset.gameId;
-        // Redirect user to information page passing game id as parameter
-        window.location.href = `/game?id=${gameId}`;
-    };
-
-    // Select all titles and game covers from document
-    const gameElements = document.querySelectorAll('.game-title, .game-cover');
-
-    // Add event listener to clickable image and title
-    gameElements.forEach(element => {
-        element.addEventListener('click', handleRedirect);
-    });
 }

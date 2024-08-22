@@ -1,8 +1,8 @@
 :root {
     /* Color variables */
-    --primary-blue: #5865F2; /* Primary blue */
+    --primary-yellow: #FFD369; /* Primary blue */
     --bad-red: #F25858;
-    --secondary-blue: #7289DA; /* Secondary blue */
+    --secondary-yellow: #FDFFBC; /* Secondary blue */
     --dark-bg: #2C2F33; /* Dark background */
     --light-gray-accent: #99AAB5; /* Light gray accent */
     --dark-gray-accent: #4F545C; /* Dark gray accent */
@@ -156,7 +156,7 @@ nav a {
 }
 
 nav a:hover {
-    color: var(--secondary-blue);
+    color: var(--secondary-yellow);
 }
 
 nav li:first-child {
@@ -215,6 +215,9 @@ input[type=search] {
     padding: 0 1em;
 }
 
+#search-button:hover {
+    cursor: pointer;
+}
 
 @media(max-width: 800px) {
     .hideOnMobile {
@@ -279,7 +282,10 @@ input[type=search] {
     align-items: start;
     height: 100%;
     padding: 1.5em 0.25em;
-    border-bottom: 1px solid var(--dark-gray-accent);
+}
+
+.game:not(:last-child) {
+    border-bottom: 1px solid var(--light-gray-accent);
 }
 
 .game-info {
@@ -287,11 +293,6 @@ input[type=search] {
     flex-direction: column;
     align-self: stretch;
 }
-
-
-/* .game:not(:last-child) {
-    border-bottom: 1px solid var(--light-gray-accent);
-} */
 
 .cover {
     display: flex;
@@ -351,6 +352,28 @@ input[type=search] {
     font-size: var(--font-size-large);
     font-weight: var(--font-weight-semi-bold);
 }
+
+.pagination {
+    text-align: center;
+}
+
+.pagination a {
+    color: black;
+    text-decoration: none;
+    padding: 15px 12px;
+    display: inline-block;
+    font-size: var(--font-size-large);
+    font-weight: var(--font-weight-light);
+}
+
+.pagination a.active {
+    font-weight: var(--font-weight-extra-bold);
+}
+
+.pagination a:hover {
+    cursor: pointer;
+}
+
 
 /* Footer Section */
 footer {
