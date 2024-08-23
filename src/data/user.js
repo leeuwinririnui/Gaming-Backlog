@@ -1,7 +1,5 @@
-// Import Mongoose
 const Mongoose = require("mongoose");
 
-// Schema for users
 const UserSchema = new Mongoose.Schema({
     username: {
         type: String, 
@@ -14,16 +12,13 @@ const UserSchema = new Mongoose.Schema({
         required: true,
     },
     role: {
-        // Admin wil have "admin" as string
         type: String,
         default: "basic",
         required: true,
     },
-    games: [String], // Array of string id's
+    games: [String], 
 });
 
-// Create User model
 const User = Mongoose.model("user", UserSchema);
 
-// Export User 
 module.exports = User;

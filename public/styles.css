@@ -1,6 +1,6 @@
 :root {
     /* Color variables */
-    --primary-yellow: #FFD369; /* Primary blue */
+    --primary-yellow: #FABC3F; /* Primary blue */
     --bad-red: #F25858;
     --secondary-yellow: #FDFFBC; /* Secondary blue */
     --dark-bg: #2C2F33; /* Dark background */
@@ -109,6 +109,10 @@
   .font-weight-black { font-weight: var(--font-weight-black); }
   
   /* UTILITY CLASSES END */  
+
+  .hidden {
+    display: none;
+  }
 
 /* Remove default margin and padding */
 * {
@@ -278,7 +282,7 @@ input[type=search] {
 .game {
     display: flex;
     justify-content: start;
-    gap: 1em;
+    gap: 1.5em;
     align-items: start;
     height: 100%;
     padding: 1.5em 0.25em;
@@ -339,6 +343,28 @@ input[type=search] {
     text-overflow: ellipsis; 
 }
 
+.add-button, .remove-button {
+    margin-top: auto;
+    padding: 10px 20px;
+    font-size: var(--font-size-xsmall);
+    font-weight: var(--font-weight-semi-bold);
+    color: var(--color-white);
+    border-radius: 6px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    cursor: pointer;
+    width: 8em;
+}
+
+.add-button {
+    background-color: var(--primary-yellow);
+}
+
+.remove-button {
+    background-color: var(--bad-red);
+}
+
 .score-container {
     display: flex;
     justify-content: center;
@@ -349,6 +375,7 @@ input[type=search] {
 
 .score {
     color: black;
+    display: flex;
     font-size: var(--font-size-large);
     font-weight: var(--font-weight-semi-bold);
 }
@@ -372,6 +399,10 @@ input[type=search] {
 
 .pagination a:hover {
     cursor: pointer;
+}
+
+.pagination a:hover:not(.active) {
+    color: var(--bad-red);
 }
 
 
@@ -402,7 +433,7 @@ footer ul li a {
     .main-container {
         padding: var(--padding-xxxlarge) 20em;
     }
-
+    
     .game {
         gap: 1.5em;
     }

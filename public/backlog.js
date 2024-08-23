@@ -1,6 +1,9 @@
+import { devideList } from "./helper.js";
+
 let devidedGames;
 
 document.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('#search-game').value = "";
     getUserList();
     filterBySearch();
 });
@@ -50,7 +53,7 @@ async function getGameData(title) {
 
         const data = await res.json();
 
-        devidedGames = devideList(data.games);
+        devidedGames = devideList(data.games, 20);
 
         addPaginationLinks(devidedGames.length);
 
@@ -76,9 +79,7 @@ async function getUserList() {
 
         const data = await res.json();
 
-        devidedGames = devideList(data.games);
-
-        console.log(devidedGames.games)
+        devidedGames = devideList(data.games, 20);
 
         addPaginationLinks(devidedGames.length);
 
@@ -107,30 +108,6 @@ function toGameInfoPage() {
     gameElements.forEach(element => {
         element.addEventListener('click', handleRedirect);
     });
-}
-
-// OPTIMIZE!!!
-// Function to devide list into array the size of n elements
-function devideList(games) {
-    let dividedGames = [];
-    let temp = { games: [] };
-    let count = 0;
-
-    games.forEach(game => {
-        if (count === 15) {
-            dividedGames.push(temp);
-            temp = { games: [] };
-            count = 0;
-        }
-        
-        temp.games.push(game);
-        count++;
-    });
-
-    // Push any remaining games
-    dividedGames.push(temp);
-    
-    return dividedGames;
 }
 
 // OPTIMIZE!!!
@@ -208,8 +185,39 @@ function addPaginationLinks(length) {
      });
 }
 
+async function addGameToList(gameId) {
+    const res = await fetch(`api/game/add?id=${gameId}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' }
+    });
+
+    if (!res.ok) {
+
+        return;
+    }
+    
+    const data = await res.json();
+
+    console.log(data.message);
+}
+
+async function removeGameFromList(gameId) {
+    const res = await fetch(`api/game/remove?id=${gameId}`, {
+        method: 'GET',
+        headers: { 'content-type': 'application/json' }
+    });
+
+    if (!res.ok) {
+        console.log()
+        return;
+    }
+
+    const data = await res.json();
 
 
+
+    console.log(data.message);
+}
 
 
 // KEEP AT BOTTOM!!
@@ -233,6 +241,8 @@ function populateList(games, list) {
                 const newInfo = document.createElement('div');
                 const newTitle = document.createElement('p');
                 const newDate = document.createElement('p');
+                const newRemoveButton = document.createElement('button');
+                const newAddButton = document.createElement('button');
                 const newScore = document.createElement('p');
                 const newScoreContainer = document.createElement('div')
 
@@ -250,20 +260,31 @@ function populateList(games, list) {
                 newTitle.innerHTML = `${gameTitle}`;
                 newDate.classList.add('release-date');
                 newDate.innerHTML = `Release Date: <strong>${releaseDate}<strong>`
+                newRemoveButton.classList.add('remove-button');
+                newRemoveButton.textContent = 'Remove';
+                newAddButton.classList.add('add-button');
+                newAddButton.classList.add('hidden');
+                newAddButton.textContent = 'Add';
                 newScoreContainer.classList.add('score-container');
                 newScore.classList.add('score');
+                newRemoveButton.addEventListener('click', () => {
+                    newRemoveButton.classList.add('hidden');
+                    newAddButton.classList.remove('hidden');
+                    removeGameFromList(gameId);
+                });
+                newAddButton.addEventListener('click', () => {
+                    newAddButton.classList.add('hidden');
+                    newRemoveButton.classList.remove('hidden');
+                    addGameToList(gameId);
+                });
                 if (mobyScore != null) {
                     newScore.innerHTML = `${mobyScore}`;
                 } else {
                     newScore.innerHTML = `0`;
                 }
-
-                // Keep number dimensions consistent
                 if (mobyScore % 1 == 0) {
                     newScore.innerHTML += `.0`
                 }
-                
-                // Add game id to be custom data attribute
                 newTitle.dataset.gameId = String(gameId);
                 newImage.dataset.gameId = String(gameId);
 
@@ -273,8 +294,10 @@ function populateList(games, list) {
                 newScoreContainer.appendChild(newScore);
                 newInfo.appendChild(newTitle);
                 newInfo.appendChild(newDate);
+                newInfo.appendChild(newRemoveButton);
+                newInfo.appendChild(newAddButton);
                 newGame.appendChild(newInfo);
-                newGame.appendChild(newScoreContainer);
+                // newGame.appendChild(newScoreContainer);
                 list.appendChild(newGame);
             }
         });

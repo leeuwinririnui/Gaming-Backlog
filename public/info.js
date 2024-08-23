@@ -134,7 +134,7 @@ async function determineButton() {
 
     button.type = 'submit';
 
-    if (data.message == "True") {
+    if (data.exists) {
 
         button.classList.add('remove-btn');
 

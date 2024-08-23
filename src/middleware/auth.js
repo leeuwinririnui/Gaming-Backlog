@@ -1,37 +1,12 @@
-// Import User model
 const User  = require('../data/user');
-
 const path = require('path');
-
-// Import bcrypt for password hashing
 const bcrypt = require('bcrypt');
-
-// Import JsonWebToken
 const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../../config.js');
+const { generateToken } = require('../util.js');
 
-// Secret key
-const jwtSecret = '7184a7e0aa374816e3ffea4f11dc52321c9c89591b198e2084c15aab74ea9de57e3771s';
-
-const maxAge = 4 * 60 * 60;
-
-// Function to generate token
-function generateToken(user) {
-    // Calculate time till token expires
-
-    const token = jwt.sign(
-        { id: user.id, username: user.username, role: user.role },
-        jwtSecret,
-        {
-            expiresIn: maxAge, 
-        }
-    );
-
-    return token;
-}
-
-// Register function to be used in server.js
+// Register and store user information in db
 const register = async (req, res, next) => {
-    // Retrieve username and password from request body
     const { username, password } = req.body;
 
     if (password.length < 8) {
@@ -42,9 +17,7 @@ const register = async (req, res, next) => {
 
     const hashPassword = await bcrypt.hash(password, 10);
 
-    // Create a new user
     try {
-        // Check if username already exists
         const existingUser = await User.findOne({ username });
         if (existingUser) {
             console.log("Username already exists");
@@ -53,7 +26,6 @@ const register = async (req, res, next) => {
             });
         }
 
-        // Await new user creation (pause function until promise is settled)
         const user = await User.create({
             username,
             password: hashPassword,
@@ -63,18 +35,14 @@ const register = async (req, res, next) => {
 
         res.cookie("jwt", token, {
             httpOnly: true,
-            maxAge: maxAge  * 1000, // 5 hours in ms
+            maxAge: 4 * 60 * 60  * 1000,
         });
 
-        // Send 200 OK status response to client
         res.status(200).json({
             message: "User successfully created",
             username: user,
         });
-        
-        sessionStorage.setItem("user_id", user.id);
 
-    // Send 401 Unauthorized response
     } catch (err) {
         res.status(500).json({
             message: "User not created",
@@ -83,7 +51,7 @@ const register = async (req, res, next) => {
     }
 }
 
-// Login function to be used in server.js
+// Log user in with jwt token
 const login = async (req, res, next) => {
     const { username, password } = req.body
 
@@ -94,7 +62,6 @@ const login = async (req, res, next) => {
     }
 
     try {
-        // Usernames are unique
         const user = await User.findOne({ username });
 
         if (!user) {
@@ -104,7 +71,6 @@ const login = async (req, res, next) => {
             });
         } 
 
-        // Compare password with hashed password in db
         const match = await bcrypt.compare(password, user.password);
 
         if (!match) {
@@ -114,20 +80,17 @@ const login = async (req, res, next) => {
             });
         }
 
-        // Call function to generate token
         const token = generateToken(user);
 
         res.cookie("jwt", token, {
             httpOnly: true,
-            maxAge: maxAge * 1000, // 5 hours in ms
+            maxAge: 4 * 60 * 60 * 1000, 
         });
 
         res.status(200).json({
             message: "Login successful",
             user,
         });
-
-        
 
     } catch(error) {
         res.status(400).json({
@@ -137,7 +100,7 @@ const login = async (req, res, next) => {
     }
 }
 
-// Function to update users role 
+// Update role of user
 const update = async (req, res, next) => {
     const { role, id } = req.body;
     
@@ -162,20 +125,16 @@ const update = async (req, res, next) => {
             });
         }
 
-        // Ensure that user is not already an admin
         if (user.role === "admin") {
             return res.status(400).json({ 
                 message: "User is already an Admin" 
             });
         }
 
-        // Assign the role of admin to user
         user.role = role;
 
-        // Save updated user
         const updatedUser = await user.save();
 
-        // Send response indicating that user role has been updated successfully
         res.status(201).json({ 
             message: "Update successful", 
             updatedUser 
@@ -184,35 +143,30 @@ const update = async (req, res, next) => {
     } catch (err) {
         res.status(400).json({ 
             message: "An error occurred", 
-            error: err.meesage 
+            error: err.message 
         });
     }
 }
 
-// Function to delete user from db
+// Delete user from db
 const deleteUser = async (req, res, next) => {
-    // Extract users id from body
     const { id } = req.body;
 
     try {
-        // Find user by id
         const user = await User.findById(id);
 
-        // Handle case where user does not exist
         if (!user) {
             return res.status(404).json({ 
                 message: "User not found" 
             });
         }
-
-        // Delete user from database
         await user.deleteOne();
 
-        // Send response indicating that deletion was successful
         res.status(201).json({ 
             message: "User successfully deleted", 
             user 
         });
+
     } catch (err) {
         res.status(400).json({ 
             message: "An error occurred", 
@@ -221,11 +175,13 @@ const deleteUser = async (req, res, next) => {
     }
 }
 
+// Authorise admin
 const adminAuth = (req, res, next) => {
     const token = req.cookies.jwt;
+
     if (token) {
         console.log("Token is here!")
-        jwt.verify(token, jwtSecret, (err, decodedToken) => {
+        jwt.verify(token, JWT_SECRET, (err, decodedToken) => {
             if (err) {
                 return res.status(401).json({ message: "Not authorized" });
             } else {
@@ -241,10 +197,12 @@ const adminAuth = (req, res, next) => {
     }
 }
 
+// Authorise user
 const userAuth = (req, res, next) => {
     const token = req.cookies.jwt;
+
     if (token) {
-        jwt.verify(token, jwtSecret, (err, decodedToken) => {
+        jwt.verify(token, JWT_SECRET, (err, decodedToken) => {
             if (err) {
                 return res
                     .status(401)
@@ -266,28 +224,23 @@ const userAuth = (req, res, next) => {
     }
 }
 
-// Function to check whether user is logged in - redirect to home page if so
+// Check whether user is logged in
 const verifyAuth = (req, res, next) => {
-    // Retrieve token from req header
     const token = req.cookies.jwt;
 
-    // If there is no token, proceed to the next middle/route handler
     if (!token) {
         return next();
     }
 
-    jwt.verify(token, jwtSecret, (err, decodedToken) => {
+    jwt.verify(token, JWT_SECRET, (err, decodedToken) => {
         if (err) {
-            // If token verification fails, proceed to the next middleware/route handler
             return next();
         }
 
-        // If token is valid, redirect to home page
         res.redirect('/home');
     })
 }
 
-// Export register function
 module.exports = { 
     register,
     login,

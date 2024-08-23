@@ -22,27 +22,21 @@ document.addEventListener('DOMContentLoaded', () =>{
     });
 });
 
-// Function to retrieve game data
+// Retrieve game data
 async function getGameData() {
     const searchInput = document.querySelector('#search-game');
     const games_list = document.querySelector('#games-list');
     const searchTitle = document.querySelector('#search-results');
-    // Retrieve game title from users entered value
     const title = searchInput.value.trim();
 
-    // Add search content to h3
     searchTitle.innerHTML = `Search Results for "<strong>${title}</strong>"`;
 
-    // Clear list of games if no input 
     if (!title) {
         games_list.innerHTML = '';
     } else {
-        // Encode title to make URL safe
         const encodedTitle = encodeURIComponent(title);
         
         try {
-
-            // Send request to server with game title
             const res = await fetch(`api/game/retrieve?title=${encodedTitle}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
@@ -53,28 +47,26 @@ async function getGameData() {
             }
 
             const data = await res.json(); 
-
-            console.log(data);
             
             if (Array.isArray(data.games)) {
                 games_list.innerHTML = '';
                 data.games.forEach(game => {
                     if (game.sample_cover && game.title && game.game_id) {
-                        // Retrieve game data to displayed to user
                         const gameCover = game.sample_cover.image;
                         const gameTitle = game.title;
                         const gameId = game.game_id;
                         const releaseDate = game.platforms[0].first_release_date;
 
-                        // Create new elements for each game
+                        // Elements
                         const newGame = document.createElement('div');  
                         const newCover = document.createElement('div');
                         const newImage = document.createElement('img');
                         const newInfo = document.createElement('div');
                         const newTitle = document.createElement('p');
                         const newDate = document.createElement('p');
+                        const newAddButton = document.createElement('button');
                         
-                        // Add attributes
+                        // Attributes
                         newGame.classList.add('game');
 
                         // Image section
@@ -88,20 +80,25 @@ async function getGameData() {
                         newTitle.innerHTML = `${gameTitle}`;
                         newDate.classList.add('release-date');
                         newDate.innerHTML = `Release Date: <strong>${releaseDate}<strong>`
-                        // Add game id to be custom data attribute
+                        newAddButton.classList.add('add-button');
+                        newAddButton.textContent = "Add";
+                        newAddButton.addEventListener('click', () => {
+                            addGameToList(gameId);
+                        });
                         newTitle.dataset.gameId = String(gameId);
                         newImage.dataset.gameId = String(gameId);
 
-                        // Append elements
+                        // Append 
                         newCover.appendChild(newImage);
                         newGame.appendChild(newCover);
                         newInfo.appendChild(newTitle);
                         newInfo.appendChild(newDate);
+                        newInfo.appendChild(newAddButton);
                         newGame.appendChild(newInfo);
                         games_list.appendChild(newGame);
                     }
                 });
-                // Add redirect event listener to each game
+
                 toGameInfoPage();
 
             } else {
@@ -114,20 +111,47 @@ async function getGameData() {
     } 
 }
 
+async function addGameToList(gameId) {
+    const res = await fetch(`api/game/add?id=${gameId}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' }
+    });
+
+    if (!res.ok) {
+
+        return;
+    }
+    
+    const data = await res.json();
+
+    console.log(data.message);
+}
+
+async function removeGameFromList() {
+    const res = await fetch(`api/game/remove?id=${gameId}`, {
+        method: 'GET',
+        headers: { 'content-type': 'application/json' }
+    });
+
+    if (!res.ok) {
+        console.log()
+    }
+
+    const data = await res.json();
+
+    console.log(data.message);
+
+    window.location.reload();
+}
+
 // Redirect user to game info page
 function toGameInfoPage() {
-    // Function to handle the redirection
     const handleRedirect = (event) => {
-        // Retrieve game id from custom data attribute
         const gameId = event.target.dataset.gameId;
-        // Redirect user to information page passing game id as parameter
         window.location.href = `/game?id=${gameId}`;
     };
-
-    // Select all titles and game covers from document
     const gameElements = document.querySelectorAll('.game-title, .game-cover');
 
-    // Add event listener to clickable image and title
     gameElements.forEach(element => {
         element.addEventListener('click', handleRedirect);
     });
