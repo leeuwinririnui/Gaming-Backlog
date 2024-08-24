@@ -1,158 +1,158 @@
+import { 
+    divideList,
+    removeGame,
+    addGame,
+    gamePage, 
+    scrollToTop,
+    handleSiblings, 
+    hideLinks 
+} from "./helper.js";
+
+let dividedList;
+
 document.addEventListener('DOMContentLoaded', () =>{
-    // Empty search
     document.querySelector('#search-game').value = "";
-    
-    const searchButton = document.querySelector('#search-button');
-    const searchInput = document.querySelector('#search-game');
-
-    // Fetch game data when search icon is clicked
-    searchButton.addEventListener('click', () => {
-        getGameData();
-    });
-
-    searchInput.addEventListener('keypress', (event) => {
-        // If the user presses the "Enter" key on the keyboard
-        if (event.key === "Enter") {
-            // Cancel the default action
-            event.preventDefault();
-
-            // Trigger search button with click
-            searchButton.click();
-        }
-    });
+    setupSearch();
 });
 
-// Retrieve game data
-async function getGameData() {
+function setupSearch() {
     const searchInput = document.querySelector('#search-game');
-    const games_list = document.querySelector('#games-list');
-    const searchTitle = document.querySelector('#search-results');
-    const title = searchInput.value.trim();
+    const searchButton = document.querySelector('#search-button');
 
-    searchTitle.innerHTML = `Search Results for "<strong>${title}</strong>"`;
+    const handleSearch = () => searchGames(searchInput.value.trim());
 
-    if (!title) {
-        games_list.innerHTML = '';
-    } else {
-        const encodedTitle = encodeURIComponent(title);
-        
-        try {
-            const res = await fetch(`api/game/retrieve?title=${encodedTitle}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
-
-            if (!res.ok) { 
-                console.error('Failed to retrieve game data');
-            }
-
-            const data = await res.json(); 
-            
-            if (Array.isArray(data.games)) {
-                games_list.innerHTML = '';
-                data.games.forEach(game => {
-                    if (game.sample_cover && game.title && game.game_id) {
-                        const gameCover = game.sample_cover.image;
-                        const gameTitle = game.title;
-                        const gameId = game.game_id;
-                        const releaseDate = game.platforms[0].first_release_date;
-
-                        // Elements
-                        const newGame = document.createElement('div');  
-                        const newCover = document.createElement('div');
-                        const newImage = document.createElement('img');
-                        const newInfo = document.createElement('div');
-                        const newTitle = document.createElement('p');
-                        const newDate = document.createElement('p');
-                        const newAddButton = document.createElement('button');
-                        
-                        // Attributes
-                        newGame.classList.add('game');
-
-                        // Image section
-                        newCover.classList.add('cover');
-                        newImage.classList.add('game-cover');
-                        newImage.src = gameCover;
-
-                        // Information section
-                        newInfo.classList.add('game-info');
-                        newTitle.classList.add('game-title');
-                        newTitle.innerHTML = `${gameTitle}`;
-                        newDate.classList.add('release-date');
-                        newDate.innerHTML = `Release Date: <strong>${releaseDate}<strong>`
-                        newAddButton.classList.add('add-button');
-                        newAddButton.textContent = "Add";
-                        newAddButton.addEventListener('click', () => {
-                            addGameToList(gameId);
-                        });
-                        newTitle.dataset.gameId = String(gameId);
-                        newImage.dataset.gameId = String(gameId);
-
-                        // Append 
-                        newCover.appendChild(newImage);
-                        newGame.appendChild(newCover);
-                        newInfo.appendChild(newTitle);
-                        newInfo.appendChild(newDate);
-                        newInfo.appendChild(newAddButton);
-                        newGame.appendChild(newInfo);
-                        games_list.appendChild(newGame);
-                    }
-                });
-
-                toGameInfoPage();
-
-            } else {
-                console.error('Invalid data format');
-            }
-
-        } catch (error) {
-            console.error('Error:', error);
+    searchButton.addEventListener('click', handleSearch);
+    searchInput.addEventListener('keypress', event => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            handleSearch();
         }
-    } 
+    });
 }
 
-async function addGameToList(gameId) {
-    const res = await fetch(`api/game/add?id=${gameId}`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' }
-    });
-
-    if (!res.ok) {
-
-        return;
-    }
+// Retrieve game data
+async function searchGames(title) {
+    const gamesList = document.querySelector('#games-list');
+    const encodedTitle = encodeURIComponent(title);
+    const searchTitle = document.querySelector('#search-results');
+    searchTitle.innerHTML = `Search Results for "<strong>${title}</strong>"`;
     
-    const data = await res.json();
+    try {
+        const res = await fetch(`api/game/retrieve?title=${encodedTitle}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
 
-    console.log(data.message);
+        if (!res.ok) throw new Error('Failed to retrieve game data');
+
+        const data = await res.json(); 
+
+        handleGameData(data.games, gamesList);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+} 
+
+function handleGameData(games, gamesList) {
+    dividedList = divideList(games, 5);
+    addPaginationLinks(dividedList.length);
+    populateList(dividedList[0].games, gamesList);
+    gamePage();
 }
 
-async function removeGameFromList() {
-    const res = await fetch(`api/game/remove?id=${gameId}`, {
-        method: 'GET',
-        headers: { 'content-type': 'application/json' }
-    });
+// Add pagination links for users list
+function addPaginationLinks(length) {
+    const gamesList = document.querySelector('#games-list');
+    const paginationContainer = document.querySelector('.pagination');
+    paginationContainer.innerHTML = '';
 
-    if (!res.ok) {
-        console.log()
+    for (let i = 0; i < length; i++) {
+        const paginationLink = document.createElement('a');
+        paginationLink.innerHTML = `${i+1}`;
+        
+        if (i === 0) { 
+            paginationLink.classList.add('active'); 
+        } 
+
+        if (i >= 1 && i <= 4) { 
+            paginationLink.classList.add('sibling');
+        }
+
+        paginationLink.addEventListener('click', () => {
+            scrollToTop();
+            populateList(dividedList[i].games, gamesList);
+            handleSiblings(paginationLink, paginationContainer, i, length);
+        });
+
+    paginationContainer.appendChild(paginationLink);
     }
 
-    const data = await res.json();
-
-    console.log(data.message);
-
-    window.location.reload();
+    hideLinks(paginationContainer.querySelectorAll('a'));
 }
 
-// Redirect user to game info page
-function toGameInfoPage() {
-    const handleRedirect = (event) => {
-        const gameId = event.target.dataset.gameId;
-        window.location.href = `/game?id=${gameId}`;
-    };
-    const gameElements = document.querySelectorAll('.game-title, .game-cover');
 
-    gameElements.forEach(element => {
-        element.addEventListener('click', handleRedirect);
-    });
+
+// Populate users list with html elements
+function populateList(games, list) {
+    if (Array.isArray(games)) {
+        list.innerHTML = '';
+        const fragment = document.createDocumentFragment();
+
+        games.forEach(game => {
+            if (game.sample_cover && game.title && game.game_id) {
+                const { sample_cover: { image: gameCover }, 
+                title: gameTitle, 
+                game_id: gameId, 
+                moby_score: mobyScore } = game;
+                const releaseDate = game.platforms[0].first_release_date;
+
+                // Elements
+                const newGame = document.createElement('div');  
+                const newCover = document.createElement('div');
+                const newImage = document.createElement('img');
+                const newInfo = document.createElement('div');
+                const newTitle = document.createElement('p');
+                const newDate = document.createElement('p');
+                const newAddButton = document.createElement('button');
+                
+                // Attributes
+                newGame.classList.add('game');
+
+                // Image section
+                newCover.classList.add('cover');
+                newImage.classList.add('game-cover');
+                newImage.src = gameCover;
+
+                // Information section
+                newInfo.classList.add('game-info');
+                newTitle.classList.add('game-title');
+                newTitle.innerHTML = `${gameTitle}`;
+                newDate.classList.add('release-date');
+                newDate.innerHTML = `Release Date: <strong>${releaseDate}<strong>`
+                newAddButton.classList.add('add-button');
+                newAddButton.textContent = "Add";
+                newAddButton.addEventListener('click', () => {
+                    addGame(gameId);
+                });
+                newTitle.dataset.gameId = String(gameId);
+                newImage.dataset.gameId = String(gameId);
+
+                // Append 
+                newCover.appendChild(newImage);
+                newGame.appendChild(newCover);
+                newInfo.appendChild(newTitle);
+                newInfo.appendChild(newDate);
+                newInfo.appendChild(newAddButton);
+                newGame.appendChild(newInfo);
+                fragment.appendChild(newGame);
+            }
+        });
+        list.appendChild(fragment);
+
+    } else {
+        console.error('Invalid data format');
+    }
+
 }
+
+// Function to determine button to display

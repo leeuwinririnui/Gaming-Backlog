@@ -152,6 +152,12 @@ const checkGame = async (req, res, next) => {
 // Fetch users list
 const fetchList = async (req, res, next) => {
     try {
+        const { page } = req.query;
+
+        if (!page) {
+            return res.status(400).json({ message: 'Page not found' });
+        }
+
         const user = await fetchUser(req.cookies.jwt);
 
         if (!user) {
@@ -160,23 +166,34 @@ const fetchList = async (req, res, next) => {
 
         const gameIds = user.games;
 
+        const chunk = 20;
+        
+        // Fetch a max amount at a time
+        const dividedGames = divideGameIds(gameIds, chunk);
+
+        console.log(gameIds);
+
         if (gameIds.length === 0) {
             return res.status(404).json({ message: "No games in users list" });
         }
 
         let endpoints = "";
-        gameIds.forEach(gameId => { endpoints += `&id=${encodeURIComponent(gameId)}` });
+        dividedGames[page].forEach(gameId => { endpoints += `&id=${encodeURIComponent(gameId)}` });
         const url = `${endpoint}?api_key=${MOBY_API}` + endpoints;
 
         const response =  await fetch(url);
 
         if (!response.ok) {
+            console.log(response);
             return response.status(400).json({ message: "Game data was not retrieved" });
         }
 
         const data = await response.json();
 
-        return res.status(200).json(data);
+        return res.status(200).json({ 
+            games: data.games,
+            gameCount: gameIds.length / chunk,
+        });
     } catch (error) {
         return res.status(500).json({ message: "Error", error });
     }
@@ -229,6 +246,27 @@ async function fetchUser(token) {
 
     return user;
 }
+
+// Divide games IDs into chunks
+function divideGameIds(gameIds, chunk) {
+    const divided = [];
+    let temp = [];
+
+    gameIds.forEach(id => {
+        if (temp.length === chunk) {
+            divided.push(temp);
+            temp = [];
+        }
+        temp.push(id);
+    });
+
+    if (temp.length > 0) {
+        divided.push(temp);
+    }
+
+    return divided;
+}
+
 
 
 module.exports = { 
