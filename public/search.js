@@ -35,6 +35,10 @@ async function searchGames(title) {
     const gamesList = document.querySelector('#games-list');
     const encodedTitle = encodeURIComponent(title);
     const searchTitle = document.querySelector('#search-results');
+    if (title === "") {
+        searchTitle.innerHTML = `Please Enter a Valid Game Title"`;
+        return;
+    }
     searchTitle.innerHTML = `Search Results for "<strong>${title}</strong>"`;
     
     try {
@@ -132,7 +136,7 @@ function populateList(games, list) {
                 newAddButton.classList.add('add-button');
                 newAddButton.textContent = "Add";
                 newAddButton.addEventListener('click', () => {
-                    addGame(gameId);
+                    addGame(gameId, gameTitle);
                 });
                 newTitle.dataset.gameId = String(gameId);
                 newImage.dataset.gameId = String(gameId);

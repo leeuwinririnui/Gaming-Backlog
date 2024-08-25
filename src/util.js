@@ -3,16 +3,29 @@ const { JWT_SECRET } = require('../config.js');
 var stringSimilarity = require("string-similarity");
 
 // Match games from users list with title from search 
-function matchTitles(games, title) {
+function matchTitles(gameTitles, title) {
     let titles = [];
 
-    games.forEach(game => {
-        if (stringSimilarity.compareTwoStrings(game.title, title) > 0.25) {
-            titles.push(game.title);
+    gameTitles.forEach(game => {
+        if (stringSimilarity.compareTwoStrings(game, title) > 0.25) {
+            titles.push(game);
         }   
     });
 
     return titles;
+}
+
+// Match games using id 
+function matchIds(games, ids) {
+    let match = [];
+
+    games.forEach(game => {
+        if (ids.includes(game.game_id)) {
+            match.push(game);
+        }   
+    });
+
+    return match;
 }
 
 // Filter users games by matching with title parameter
@@ -43,6 +56,7 @@ function generateToken(user) {
 
 module.exports = { 
     matchTitles, 
+    matchIds,
     filterGamesByTitle,
     generateToken
 }

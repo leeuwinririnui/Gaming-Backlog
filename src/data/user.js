@@ -16,7 +16,18 @@ const UserSchema = new Mongoose.Schema({
         default: "basic",
         required: true,
     },
-    games: [String], 
+    games: [
+        {
+            id: {
+                type: String,
+                required: true,
+            },
+            title: {
+                type: String,
+                required: true,
+            }
+        }
+    ], 
 });
 
 const User = Mongoose.model("user", UserSchema);

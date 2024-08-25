@@ -1,14 +1,14 @@
 :root {
     /* Color variables */
-    --primary-yellow: #FABC3F; /* Primary blue */
+    --primary-yellow: #FABC3F; 
     --bad-red: #F25858;
-    --secondary-yellow: #FFD369; /* Secondary blue */
-    --dark-bg: #2C2F33; /* Dark background */
-    --light-gray-accent: #99AAB5; /* Light gray accent */
-    --dark-gray-accent: #4F545C; /* Dark gray accent */
-    --lighter-gray: #DCDDDE; /* Lighter gray */
-    --white: #FFFFFF; /* White */
-    --alternative-dark-bg: #242424; /* Alternative dark background */
+    --secondary-yellow: #FFD369;
+    --dark-bg: #2C2F33;
+    --light-gray-accent: #99AAB5; 
+    --dark-gray-accent: #4F545C;
+    --lighter-gray: #DCDDDE; 
+    --white: #FFFFFF; 
+    --alternative-dark-bg: #242424; 
   
   
     /* White color variables */
@@ -305,13 +305,11 @@ input[type=search] {
 }
 
 .game-cover {
-    width: 5.5em; /* Set the desired width */
-    height: 5.5em; /* Set the desired height */
-    object-fit: cover; /* Crop the image to fill the container */
-    object-position: center; /* Position the image in the center */
-    border: 1px solid var(--dark-gray-accent);
+    width: 5.5em; 
+    height: 5.5em;
+    object-fit: cover; 
+    object-position: center; 
     border-radius: 4px;
-
 }
 
 .game-cover:hover,

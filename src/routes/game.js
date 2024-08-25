@@ -8,7 +8,6 @@ const {
     checkGame, 
     removeGame, 
     fetchList, 
-    searchList 
 } = require("../controllers/moby");
 
 router.route("/retrieve").get(fetchGame);
@@ -17,6 +16,5 @@ router.route("/add").post(addGame);
 router.route("/check").get(checkGame);
 router.route("/remove").get(removeGame);
 router.route("/backlog").get(fetchList);
-router.route("/search").get(searchList);
 
 module.exports = router;

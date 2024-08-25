@@ -8,12 +8,11 @@ import {
 } from "./helper.js";
 
 let currentList;
-
-// Hold value of active pagingation link
+let allGameIds;
 let page = 0;
-
 let gameCount = 0;
 
+// Initialize page 
 document.addEventListener('DOMContentLoaded', async () => {
     document.querySelector('#search-game').value = "";
     await getUserList();
@@ -21,50 +20,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     addPaginationLinks(gameCount);
 });
 
+// Handle search functionality
 function setupSearch() {
     const searchInput = document.querySelector('#search-game');
     const searchButton = document.querySelector('#search-button');
 
-    const handleSearch = () => searchGames(searchInput.value.trim());
+    const searchList = async () => {
+        // Reset page to first when searching
+        page = 0;
+        await getUserList(searchInput.value.trim());
+        addPaginationLinks(gameCount, searchInput.value.trim());
+    }
 
-    searchButton.addEventListener('click', handleSearch);
-    searchInput.addEventListener('keypress', event => {
+    searchButton.addEventListener('click', async () => {
+        searchList();
+    });
+    searchInput.addEventListener('keypress', async event => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            handleSearch();
+            searchList();
         }
     });
 }
 
-// Retrieve game data 
-async function searchGames(title) {
-    if (title === "") return getUserList();
-
-    const gamesList = document.querySelector('#games-list');
-    const encodedTitle = encodeURIComponent(title);
-
-    try {
-        const res = await fetch(`api/game/search?title=${encodedTitle}`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json'}
-        });
-
-        if (!res.ok) throw new Error('Failed to retrieve game data');
-
-        const data = await res.json();
-
-        handleGameData(data.games, gamesList);
-    } catch (error) {
-        console.error('Error:', error);
-    }
-}
-
-// Retrieve users list
-async function getUserList() {
+// Retrieve users list of games
+async function getUserList(title) {
     const gamesList = document.querySelector('#games-list');
 
     try {
-        const res = await fetch(`api/game/backlog?page=${page}`, {
+        // Users list will be filtered if there is a title
+        const res = await fetch(`api/game/backlog?page=${page}&title=${title}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json'}
         });
@@ -74,7 +59,11 @@ async function getUserList() {
         const data = await res.json();
 
         currentList = data.games;
-        gameCount = data.gameCount; 
+        gameCount = Math.ceil(data.gameCount); 
+
+        allGameIds = data.gameIds;
+
+        console.log(allGameIds);
 
         handleGameData(gamesList);
         scrollToTop();
@@ -84,13 +73,15 @@ async function getUserList() {
     }
 }
 
+// Handle and display game data
 function handleGameData(gamesList) {
     populateList(currentList, gamesList);
-    gamePage();
+    gamePage(); // Add redirect listener to each games tile and cover image
 }
 
-// Add pagination links for users list
-function addPaginationLinks(length) {
+// Add papgination links
+function addPaginationLinks(length, title) {
+    console.log("Pagination links:", length);
     const paginationContainer = document.querySelector('.pagination');
     paginationContainer.innerHTML = '';
 
@@ -98,19 +89,20 @@ function addPaginationLinks(length) {
         const paginationLink = document.createElement('a');
         paginationLink.innerHTML = `${i+1}`;
         
-        // Initial document load pagination set up
-        if (i === 0) { 
+        // Initial pagination setup 
+        if (page === 0 && i === 0) { 
             paginationLink.classList.add('active'); 
         } 
 
-        if (i >= 1 && i <= 4) { 
+        if (page === 0 && i >= 1 && i <= 4) { 
             paginationLink.classList.add('sibling');
         }
 
         paginationLink.addEventListener('click', () => {  
+            // Correct page will be used when retrieving users list 
             page = i;
-            handleSiblings(paginationLink, paginationContainer, i, length);
-            getUserList();
+            handleSiblings(paginationLink, paginationContainer, page, length);
+            getUserList(title);
         });
 
     paginationContainer.appendChild(paginationLink);
@@ -119,7 +111,7 @@ function addPaginationLinks(length) {
     hideLinks(paginationContainer.querySelectorAll('a'));
 }
 
-// Populate users list with html elements
+// Populate users list with game elements
 function populateList(games, list) {
     if (Array.isArray(games)) {
         list.innerHTML = '';
@@ -182,13 +174,13 @@ function populateList(games, list) {
                 newAddButton.addEventListener('click', () => {
                     newAddButton.classList.add('hidden');
                     newRemoveButton.classList.remove('hidden');
-                    addGame(gameId);
+                    addGame(gameId, gameTitle);
                 });
 
                 newTitle.dataset.gameId = String(gameId);
                 newImage.dataset.gameId = String(gameId);
 
-                // Append elements
+                // Append elements to their parents
                 newCover.appendChild(newImage);
                 newGame.appendChild(newCover);
                 newScoreContainer.appendChild(newScore);
@@ -198,7 +190,8 @@ function populateList(games, list) {
                 newInfo.appendChild(newAddButton);
                 newGame.appendChild(newInfo);
                 // newGame.appendChild(newScoreContainer);
-
+                
+                // Append to document fragment
                 fragment.appendChild(newGame);
             }
         });

@@ -20,19 +20,19 @@ export const divideList = (games, chunk) => {
 }
 
 // Add game by ID to users list
-export async function addGame(gameId) {
-    const res = await fetch(`api/game/add?id=${gameId}`, {
+export async function addGame(gameId, gameTitle) {
+    const res = await fetch(`api/game/add?id=${gameId}&title=${gameTitle}`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' }
     });
-
-    if (!res.ok) {
-        console.error({ error: res.message });
-        return;
-    }
     
     const data = await res.json();
 
+    if (!res.ok) {
+        console.error(data.message);
+        return;
+    }
+    
     console.log(data.message);
 }
 
@@ -43,13 +43,12 @@ export async function removeGame(gameId) {
         headers: { 'content-type': 'application/json' }
     });
 
+    const data = await res.json();
+    
     if (!res.ok) {
-        console.error({ error: res.message });
+        console.error(data.message);
         return;
     }
-
-    const data = await res.json();
-
     console.log(data.message);
 }
 
