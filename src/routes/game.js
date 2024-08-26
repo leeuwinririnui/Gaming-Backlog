@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const { 
-    fetchGame, 
+    fetchGames, 
     gamePage, 
     addGame, 
     checkGame, 
@@ -10,7 +10,7 @@ const {
     fetchList, 
 } = require("../controllers/moby");
 
-router.route("/retrieve").get(fetchGame);
+router.route("/retrieve").get(fetchGames);
 router.route("/info").get(gamePage);
 router.route("/add").post(addGame);
 router.route("/check").get(checkGame);

@@ -26,16 +26,17 @@ function setupSearch() {
     const searchButton = document.querySelector('#search-button');
 
     const searchList = async () => {
-        // Reset page to first when searching
+        // Set active page to first (0) for each new search
         page = 0;
+        // Ensure all users games are retrieved before adding links
         await getUserList(searchInput.value.trim());
         addPaginationLinks(gameCount, searchInput.value.trim());
     }
 
-    searchButton.addEventListener('click', async () => {
+    searchButton.addEventListener('click', () => {
         searchList();
     });
-    searchInput.addEventListener('keypress', async event => {
+    searchInput.addEventListener('keypress', event => {
         if (event.key === 'Enter') {
             event.preventDefault();
             searchList();
@@ -48,7 +49,7 @@ async function getUserList(title) {
     const gamesList = document.querySelector('#games-list');
 
     try {
-        // Users list will be filtered if there is a title
+        // Users list will be filtered if title is passed
         const res = await fetch(`api/game/backlog?page=${page}&title=${title}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json'}
@@ -58,25 +59,20 @@ async function getUserList(title) {
 
         const data = await res.json();
 
+        // Update current list with newly retrieved data
         currentList = data.games;
+        // Round up to ensure all games are covered
         gameCount = Math.ceil(data.gameCount); 
+        // Could come in handy
+        allGameIds = data.gameIds
 
-        allGameIds = data.gameIds;
-
-        console.log(allGameIds);
-
-        handleGameData(gamesList);
+        populateList(currentList, gamesList);
+        gamePage();
         scrollToTop();
 
     } catch (error) {
         console.log(error);
     }
-}
-
-// Handle and display game data
-function handleGameData(gamesList) {
-    populateList(currentList, gamesList);
-    gamePage(); // Add redirect listener to each games tile and cover image
 }
 
 // Add papgination links
@@ -99,12 +95,12 @@ function addPaginationLinks(length, title) {
         }
 
         paginationLink.addEventListener('click', () => {  
-            // Correct page will be used when retrieving users list 
+            // Corresponding page will be sent when retrieving users list 
             page = i;
             handleSiblings(paginationLink, paginationContainer, page, length);
             getUserList(title);
         });
-
+        
     paginationContainer.appendChild(paginationLink);
     }
 
@@ -118,12 +114,29 @@ function populateList(games, list) {
         const fragment = document.createDocumentFragment();
 
         games.forEach(game => {
-            if (game.sample_cover && game.title && game.game_id) {
-                const { sample_cover: { image: gameCover }, 
-                title: gameTitle, 
-                game_id: gameId, 
-                moby_score: mobyScore } = game;
-                const releaseDate = game.platforms[0].first_release_date;
+                // Default data attributes
+                let gameCover = 'default-cover.jpg';
+                let gameTitle = 'Untitled Game';
+                let gameId = 'N/A';
+                let mobyScore = 'N/A';
+                let releaseDate = 'Unknown Release Date';
+
+                // Check if data exists before updating 
+                if (game.sample_cover && game.sample_cover.image) {
+                    gameCover = game.sample_cover.image;
+                }
+                if (game.title) {
+                    gameTitle = game.title;
+                }
+                if (game.game_id) {
+                    gameId = game.game_id;
+                }
+                if (game.moby_score) {
+                    mobyScore = game.moby_score;
+                }
+                if (game.platforms && game.platforms[0] && game.platforms[0].first_release_date) {
+                    releaseDate = game.platforms[0].first_release_date;
+                }
 
                 // Create elements
                 const newGame = document.createElement('div');  
@@ -193,7 +206,6 @@ function populateList(games, list) {
                 
                 // Append to document fragment
                 fragment.appendChild(newGame);
-            }
         });
 
         list.appendChild(fragment);

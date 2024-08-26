@@ -10,20 +10,34 @@ const {
     JWT_SECRET, 
     MOBY_API 
 } = require('../../config.js');
-const chunk = 10;
+const chunk = 20;
 
 // Fetch games from Mobygames api 
-const fetchGame = async (req, res, next) => {
-    const { title } = req.query;
+const fetchGames = async (req, res, next) => {
+    const { title, page } = req.query;
 
     if (!title) {
         return res.status(400).json({ message: 'Game title is required' });
     }
 
+    if (!page) {
+        return res.status(400).json({ message: 'Page number is required' });
+    }
+
     const url = `${endpoint}?api_key=${MOBY_API}&title=${encodeURIComponent(title)}`;
 
     try {
+        const user = await fetchUser(req.cookies.jwt);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const userGames = user.games;
+        const gameIds = userGames.map(game => game.id);
+
         const response = await fetch(url);
+        
 
         if (!response.ok) {
             return res.status(response.status).json({
@@ -33,7 +47,13 @@ const fetchGame = async (req, res, next) => {
         
         const data = await response.json();
 
-        res.status(200).json(data);
+        const dividedGames = divideArray(data.games, chunk);
+        
+        res.status(200).json({ 
+            games: dividedGames[page],
+            gameCount: dividedGames.length,
+            gameIds: gameIds
+        });
         
     } catch (error) {
         res.status(500).json({ message: 'Internal Server Error' });
@@ -51,17 +71,30 @@ const gamePage = async (req, res, next) => {
     const url = `${endpoint}?api_key=${MOBY_API}&id=${encodeURIComponent(id)}`;
 
     try {
+        const user = await fetchUser(req.cookies.jwt);
+
+        const userGames = user.games;
+        const gameIds = userGames.map(game => game.id);
+
+        let hasGame = false;
+
+        if (gameIds.includes(id)) {
+            hasGame = true;
+        }
+
         const response = await fetch(url);
 
         if (!response.ok) {
             return res.status(response.stauts).json({ 
-                Message: "Game was not found or there was an error with the request"
+                message: "Game was not found or there was an error with the request"
             });
         }
 
         const data = await response.json();
 
-        res.status(200).json(data);
+        console.log(data)
+
+        res.status(200).json({ game: data.games[0], hasGame });
     } catch (error) {
         res.status(500).json({ message: 'Internal server error' });
     }
@@ -192,7 +225,9 @@ const fetchList = async (req, res, next) => {
         if (title && title !== 'undefined') {
             const matchedTitles = matchTitles(userTitles, title);
 
-            gamesToFetch = userGames.filter(game => matchedTitles.includes(game.title)).map(game => game.id);
+            gamesToFetch = userGames
+                .filter(game => matchedTitles.includes(game.title))
+                .map(game => game.id);
         }
 
 
@@ -258,7 +293,7 @@ function divideArray(array, chunkSize) {
 }
 
 module.exports = { 
-    fetchGame, 
+    fetchGames, 
     gamePage, 
     addGame,
     checkGame,

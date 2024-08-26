@@ -1,169 +1,177 @@
-// Get current URL
+import { 
+    removeGame, 
+    addGame
+
+ } from "./helper.js";
+
 const url = new URL(window.location.href);
-
-// Create a URLSearchParams object
 const params = new URLSearchParams(url.search);
-
-// Extract id parameter
 const gameId = params.get('id');
-
-// Encode id
 const encodedId = encodeURIComponent(gameId);
 
-// Function to retrieve relevant game information
-async function getGameInfo() {
-    const res = await fetch(`api/game/info?id=${encodedId}`, {
-        method: 'GET',
-        headers: { 'content-type': 'application/json' }
-    });
+// Check whether game is in users list
+let hasGame;
 
-    if (!res.ok) {
-        console.error(await res.json());
-    }
-
-    const data = await res.json();
-
-    console.log(data);
-
-    // Extract data (should only be one element)
-    const game = data.games[0];
-
-    // Check if game exists
-    if (game) {
-        const { 
-            title, description, sample_cover, moby_score, num_votes, sample_screenshots, genres
-         } = game;
-
-
-        console.log(game);
-         
-        document.querySelector('.game-cover').src = sample_cover.image;
-        document.querySelector('.title').innerHTML = `${title}`;
-        document.querySelector('.description').innerHTML = `${description}`;
-        document.querySelector('.score').innerHTML += `${moby_score}`;
-        // Uses different classes depending on the score of game
-        if (moby_score >= 7) {
-            document.querySelector('.score').classList.replace('score', 'score-good');
-        } else if (moby_score <= 7 && moby_score >= 4) {
-            document.querySelector('.score').classList.replace('score', 'score-av');
-        } else {
-            document.querySelector('.score').classList.replace('score', 'score-bad');
-        }
-        document.querySelector('.votes').innerHTML += `${num_votes}`;
-
-        // Retrieve screen shots from sample_screenshots array if array is not empty
-        if (sample_screenshots.length) {
-            sample_screenshots.forEach(screen => {
-                const shot = document.createElement('img');
-                shot.classList.add('screenshot');
-                shot.src = screen.image;
-                console.log(screen);
-                document.querySelector('.sample-screenshots').appendChild(shot);
-            });
-        }
-        // Retrieve genres from genres array if array is not empty
-        if (genres) {
-            genres.forEach(gameGenre => {
-                const genre = document.createElement('p');
-                genre.classList.add('genre');
-                genre.innerHTML = gameGenre.genre_name;
-                document.querySelector('.info-genre').appendChild(genre);
-            });
-        }
-
-    } else {
-        // Add HTML for error as well
-
-        console.log("Error - could not retrieve game data");
-    }
-}
-
-async function addGameToList() {
-    const res = await fetch(`api/game/add?id=${gameId}`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' }
-    });
-
-    if (!res.ok) {
-
-        return;
-    }
-    
-    const data = await res.json();
-
-    console.log(data.message);
-
-    window.location.reload();
-    
-}
-
-async function removeGameFromList() {
-    const res = await fetch(`api/game/remove?id=${gameId}`, {
-        method: 'GET',
-        headers: { 'content-type': 'application/json' }
-    });
-
-    if (!res.ok) {
-        console.log()
-    }
-
-    const data = await res.json();
-
-    console.log(data.message);
-
-    window.location.reload();
-}
-
-async function determineButton() {
-    const res = await fetch(`api/game/check?id=${gameId}`, {
-        method: 'GET',
-        headers: { 'content-type': 'application/json' }
-    });
-
-    if (!res.ok) {
-        console.log();
-    }
-
-    const data = await res.json()
-
-    console.log(data.message)
-
-    const button = document.createElement('button');
-
-    button.id = 'list-btn';
-
-    button.type = 'submit';
-
-    if (data.exists) {
-
-        button.classList.add('remove-btn');
-
-        button.classList.remove('add-btn');
-
-        button.innerHTML = `Remove from List`;
-
-        button.addEventListener(('click'), () => {
-            removeGameFromList();
-        });
-
-        document.querySelector('.button-section').append(button);
-    } else {
-        button.classList.add('add-btn');
-
-        button.classList.remove('remove-btn');
-
-        button.innerHTML = `Add to List`;
-
-        button.addEventListener(('click'), () => {
-            addGameToList();
-        });
-
-        document.querySelector('.button-section').append(button);
-    }
-}
-
+// Initialize page
 document.addEventListener('DOMContentLoaded', () => {
-    determineButton();
-    getGameInfo();
+    gameData();
 });
 
+// Retrieve game information
+async function gameData() {
+    try {
+        const res = await fetch(`api/game/info?id=${encodedId}`, {
+            method: 'GET',
+            headers: { 'content-type': 'application/json' }
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            console.log(data.message);
+        }
+
+        hasGame = data.hasGame;
+        extractData(data.game);
+
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+// Extract information from game object
+function extractData(game) {
+    // Default data attributes
+    let gameCover = 'default-cover.jpg';
+    let screenshots = 'Screenshots'
+    let gameTitle = 'Untitled Game';
+    let gameId = 'N/A';
+    let genres = 'N/A';
+    let description = 'N/A';
+    let mobyScore = 'N/A';
+    let platforms = 'Unknown platforms';
+    let releaseDate = 'Unknown Release Date';
+
+    // Check if data exists before updating 
+    if (game.sample_cover && game.sample_cover.image) {
+        gameCover = game.sample_cover.image;
+    }
+    if (game.sample_screenshots) {
+        screenshots = game.sample_screenshots;
+    }
+    if (game.title) {
+        gameTitle = game.title;
+    }
+    if (game.game_id) {
+        gameId = game.game_id;
+    }
+    if (game.moby_score) {
+        mobyScore = game.moby_score;
+    }
+    if (game.genres) {
+        genres = game.genres
+    }
+    if (game.description) {
+        description = game.description;
+    }
+    if (game.platforms) {
+        platforms = game.platforms;
+        console.log(platforms)
+    }
+    if (game.platforms && game.platforms[0] && game.platforms[0].first_release_date) {
+        releaseDate = game.platforms[0].first_release_date;
+    }
+    
+    // Render page
+    renderGameData(gameCover, screenshots, gameTitle, genres, description, releaseDate, platforms, mobyScore, hasGame);
+}
+
+// Render page with game data
+function renderGameData(cover, screenshots, title, genres, description, date, platforms, score) {
+    // Create and append game cover
+    const coverContainer = document.querySelector('.cover-container');
+    const gameCover = document.createElement('img');
+    gameCover.src = cover;
+    gameCover.alt = `Cover of ${title}`;
+    gameCover.classList.add('game-cover');
+    coverContainer.appendChild(gameCover);
+
+    // Create and append sample screenshots
+    const screenshotContainer = document.querySelector('.screenshot-container');
+    screenshots.forEach(screenshot => {
+        const gameScreenshot = document.createElement('img');
+        gameScreenshot.src = screenshot.image;
+        gameScreenshot.alt = `Sample of ${title}`;
+        gameScreenshot.classList.add('screenshot');
+        screenshotContainer.appendChild(gameScreenshot);
+    });
+
+    // Create and append game title
+    const titleContainer = document.querySelector('.title-container');
+    const gameTitle = document.createElement('p');
+    gameTitle.innerHTML = title;
+    gameTitle.classList.add('title');
+    titleContainer.appendChild(gameTitle);
+
+    // Create and append game score
+    const scoreContainer = document.querySelector('.score-container');
+    const gameScore = document.createElement('p');
+    gameScore.innerHTML = `Moby Score: ${score}`;
+    gameScore.classList.add('moby-score');
+    scoreContainer.appendChild(gameScore);
+
+    // Create and append platforms
+    const platformContainer = document.querySelector('.platform-container');
+    platforms.forEach(platform => {
+        const gamePlatform = document.createElement('p');
+        gamePlatform.innerHTML = `${platform.platform_name}: <strong>${platform.first_release_date}<strong>`;
+        gamePlatform.classList.add('platform');
+        platformContainer.appendChild(gamePlatform);
+    });
+
+    // Create and append genres
+    const genreContainer =  document.querySelector('.genre-container');
+    genres.forEach(genre => {
+        const gameGenre = document.createElement('p');
+        gameGenre.innerHTML = `${genre.genre_name}`;
+        gameGenre.classList.add('genre');
+        genreContainer.appendChild(gameGenre);
+    });
+
+    // Create and append description
+    const descriptionContainer = document.querySelector('.description-container');
+    const gameDescription = document.createElement('p');
+    gameDescription.innerHTML = description;
+    gameDescription.classList.add('description');
+    descriptionContainer.appendChild(gameDescription);
+
+    // Create and append add and remove buttons
+    const buttonContainer = document.querySelector('.button-container');
+
+    const addButton = document.createElement('button');
+    addButton.innerHTML = `Add`;
+    addButton.classList.add('add-button');
+    buttonContainer.appendChild(addButton);
+    addButton.addEventListener('click', () => {
+        addButton.classList.add('hidden');
+        removeButton.classList.remove('hidden');
+        addGame(gameId, title);
+    });
+
+    const removeButton = document.createElement('button');
+    removeButton.innerHTML = `Remove`;
+    removeButton.classList.add('remove-button');
+    buttonContainer.appendChild(removeButton);
+    removeButton.addEventListener('click', () => {
+        removeButton.classList.add('hidden');
+        addButton.classList.remove('hidden');
+        removeGame(gameId);
+    });
+
+    if (hasGame) { 
+        addButton.classList.add('hidden'); 
+    }
+    else { 
+        removeButton.classList.add('hidden');
+    }
+}
