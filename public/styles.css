@@ -3,7 +3,11 @@
     --primary-yellow: #FABC3F; 
     --primary-blue: #7289DA;
     --secondary-blue: #5865F2;
+    --secondary-blue-darker: #454FDB;
+
     --bad-red: #F25858;
+    --bad-red-darker: #D14747;
+
     --secondary-yellow: #FFD369;
     --dark-bg: #2C2F33;
     --light-gray-accent: #99AAB5; 
@@ -133,7 +137,7 @@ nav {
     display: flex;
     background-color: var(--alternative-dark-bg);
     box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.1);
-    padding: var(--padding-small) 0;
+    padding: var(--padding-small) var(--padding-large);
     height: 8vh;
 }
 
@@ -243,7 +247,16 @@ input[type=search] {
 
 @media(min-width: 800px) {
     nav {
-        padding: var(--padding-small) 15em;;
+        padding: var(--padding-small) 20em;
+    }
+
+    nav ul {
+        display: flex;
+        gap: 2.5em;
+    }
+
+    nav a {
+        padding: 0 0;
     }
     
 }
@@ -251,7 +264,7 @@ input[type=search] {
 /* Main body/container */
 
 .main-container {
-    min-height: 62vh;
+    min-height: 92vh;
     padding: var(--padding-xxlarge) var(--padding-large) ;
 }
 
@@ -275,10 +288,23 @@ input[type=search] {
     text-overflow: ellipsis; 
 }
 
+@media(min-width: 800px) {
+    .games-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5%;
+        height: auto;
+    }
+
+    .game {
+        width: 45%; 
+    }
+    
+}
 
 /* Game listing */
 .games-list {
-    padding: var(--padding-xlarge) 0;
+    height: auto;
 }
 
 .game {
@@ -288,10 +314,7 @@ input[type=search] {
     align-items: start;
     height: 100%;
     padding: 1.5em 0.25em;
-}
-
-.game:not(:last-child) {
-    border-bottom: 1px solid var(--light-gray-accent);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .game-info {
@@ -347,22 +370,31 @@ input[type=search] {
     margin-top: auto;
     padding: 10px 20px;
     font-size: var(--font-size-xsmall);
-    font-weight: var(--font-weight-semi-bold);
+    font-weight: 500;
     color: var(--color-white);
     border-radius: 6px;
     border: none;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     text-align: center;
-    cursor: pointer;
     width: 8em;
 }
 
 .add-button {
-    background-color: var(--primary-yellow);
+    background-color: var(--secondary-blue);
+}
+
+.add-button:hover {
+    cursor: pointer;
+    background-color: var(--secondary-blue-darker);
 }
 
 .remove-button {
     background-color: var(--bad-red);
+}
+
+.remove-button:hover {
+    cursor: pointer;
+    background-color: var(--bad-red-darker);
 }
 
 .score-container {
@@ -402,7 +434,7 @@ input[type=search] {
 }
 
 .pagination a:hover:not(.active) {
-    color: var(--bad-red);
+    color: var(--secondary-blue-darker);
 }
 
 

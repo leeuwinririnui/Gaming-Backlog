@@ -114,6 +114,7 @@ function populateList(games, list) {
         const fragment = document.createDocumentFragment();
 
         games.forEach(game => {
+                
                 // Default data attributes
                 let gameCover = 'default-cover.jpg';
                 let gameTitle = 'Untitled Game';
@@ -138,7 +139,7 @@ function populateList(games, list) {
                     releaseDate = game.platforms[0].first_release_date;
                 }
 
-                // Create elements
+                // Create 
                 const newGame = document.createElement('div');  
                 const newCover = document.createElement('div');
                 const newImage = document.createElement('img');
