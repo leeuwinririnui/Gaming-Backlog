@@ -109,108 +109,149 @@ function addPaginationLinks(length, title) {
 
 // Populate users list with game elements
 function populateList(games, list) {
-    if (Array.isArray(games)) {
-        list.innerHTML = '';
-        const fragment = document.createDocumentFragment();
+    list.innerHTML = '';
+    const fragment = document.createDocumentFragment();
 
-        games.forEach(game => {
-                
-                // Default data attributes
-                let gameCover = 'default-cover.jpg';
-                let gameTitle = 'Untitled Game';
-                let gameId = 'N/A';
-                let mobyScore = 'N/A';
-                let releaseDate = 'Unknown Release Date';
+    games.forEach(game => {
+        // Extract data from game object
+        const data = extractData(game)
 
-                // Check if data exists before updating 
-                if (game.sample_cover && game.sample_cover.image) {
-                    gameCover = game.sample_cover.image;
-                }
-                if (game.title) {
-                    gameTitle = game.title;
-                }
-                if (game.game_id) {
-                    gameId = game.game_id;
-                }
-                if (game.moby_score) {
-                    mobyScore = game.moby_score;
-                }
-                if (game.platforms && game.platforms[0] && game.platforms[0].first_release_date) {
-                    releaseDate = game.platforms[0].first_release_date;
-                }
+        // Create new game element
+        const gameElement = document.createElement('div');
+        gameElement.classList.add('game');  
+        
+        // Create elements for game cover 
+        const coverContainer = document.createElement('div');
+        const cover = document.createElement('img');
+        coverContainer.classList.add('cover-container');
+        cover.classList.add('game-cover');
+        cover.src = data.gameCover;
+        cover.dataset.gameId = String(data.gameId);
+        coverContainer.appendChild(cover);
+        gameElement.appendChild(coverContainer);
+        
+        // Create elements for game title
+        const titleContainer = document.createElement('div');
+        const title = document.createElement('p');
+        titleContainer.classList.add('title-container')
+        title.classList.add('title');
+        title.innerHTML = `${data.gameTitle}`;
+        title.dataset.gameId = String(data.gameId);
+        titleContainer.appendChild(title)
 
-                // Create 
-                const newGame = document.createElement('div');  
-                const newCover = document.createElement('div');
-                const newImage = document.createElement('img');
-                const newInfo = document.createElement('div');
-                const newTitle = document.createElement('p');
-                const newDate = document.createElement('p');
-                const newRemoveButton = document.createElement('button');
-                const newAddButton = document.createElement('button');
-                const newScore = document.createElement('p');
-                const newScoreContainer = document.createElement('div')
+        // Create elements for game release date
+        const dateContainer = document.createElement('div');
+        const date = document.createElement('p');
+        dateContainer.classList.add('date-container');
+        date.classList.add('date');
+        date.innerHTML = `Released: <strong>${data.releaseDate}<strong>`;
+        dateContainer.appendChild(date);
 
-                // Set Attributes and content
-                newGame.classList.add('game');
+        const genreContainer = document.createElement('div');
+        const genre = document.createElement('p');
+        genreContainer.classList.add('genre-container');
+        genre.classList.add('genre');
+        data.genres.forEach(gameGenre => {
+            if (gameGenre.genre_category === "Basic Genres") {
+                genre.innerHTML = `${gameGenre.genre_name}`;
+                return;
+            }
+        });
+        genreContainer.appendChild(genre);
+        
+        // Create remove and add button elements
+        const buttonContainer = document.createElement('div');
+        const remove = document.createElement('button');
+        const add = document.createElement('button');
+        buttonContainer.classList.add('button-container');
+        remove.classList.add('remove-button');
+        remove.textContent = 'Remove';
+        add.classList.add('add-button');
+        add.classList.add('hidden');
+        add.textContent = 'Add';
+        buttonContainer.appendChild(remove);
+        buttonContainer.appendChild(add);
 
-                newCover.classList.add('cover');
-                newImage.classList.add('game-cover');
-                newImage.src = gameCover;
-
-                newInfo.classList.add('game-info');
-                newTitle.classList.add('game-title');
-                newTitle.innerHTML = gameTitle;
-                
-                newDate.classList.add('release-date');
-                newDate.innerHTML = `Release Date: <strong>${releaseDate}<strong>`
-
-                newRemoveButton.classList.add('remove-button');
-                newRemoveButton.textContent = 'Remove';
-
-                newAddButton.classList.add('add-button');
-                newAddButton.classList.add('hidden');
-                newAddButton.textContent = 'Add';
-
-                newScoreContainer.classList.add('score-container');
-                newScore.classList.add('score');
-                newScore.innerHTML = (mobyScore != null) ? mobyScore : 0;
-                if (mobyScore % 1 == 0) {
-                    newScore.innerHTML += `.0`
-                }
-                
-                // Event listeners
-                newRemoveButton.addEventListener('click', () => {
-                    newRemoveButton.classList.add('hidden');
-                    newAddButton.classList.remove('hidden');
-                    removeGame(gameId);
-                });
-                newAddButton.addEventListener('click', () => {
-                    newAddButton.classList.add('hidden');
-                    newRemoveButton.classList.remove('hidden');
-                    addGame(gameId, gameTitle);
-                });
-
-                newTitle.dataset.gameId = String(gameId);
-                newImage.dataset.gameId = String(gameId);
-
-                // Append elements to their parents
-                newCover.appendChild(newImage);
-                newGame.appendChild(newCover);
-                newScoreContainer.appendChild(newScore);
-                newInfo.appendChild(newTitle);
-                newInfo.appendChild(newDate);
-                newInfo.appendChild(newRemoveButton);
-                newInfo.appendChild(newAddButton);
-                newGame.appendChild(newInfo);
-                // newGame.appendChild(newScoreContainer);
-                
-                // Append to document fragment
-                fragment.appendChild(newGame);
+        // Add event listeners to buttons
+        remove.addEventListener('click', () => {
+            remove.classList.add('hidden');
+            add.classList.remove('hidden');
+            removeGame(data.gameId);
+        });
+        add.addEventListener('click', () => {
+            add.classList.add('hidden');
+            remove.classList.remove('hidden');
+            addGame(data.gameId, data.gameTitle);
         });
 
-        list.appendChild(fragment);
-    } else {
-        console.error("Invalid data format");
+        // Create info container and append game elements
+        const infoContainer = document.createElement('div');
+        infoContainer.classList.add('game-info');
+        infoContainer.appendChild(titleContainer);
+        infoContainer.appendChild(dateContainer);
+        infoContainer.appendChild(genreContainer);
+        infoContainer.appendChild(buttonContainer);
+        gameElement.appendChild(infoContainer);
+        
+        // Create score elements
+        const scoreContainer = document.createElement('div');
+        const scoreLabel = document.createElement('p');
+        const score = document.createElement('p');
+        scoreContainer.classList.add('score-container');
+        scoreLabel.classList.add('score-label');
+        score.classList.add('score');
+        scoreLabel.innerHTML = `<strong>Score<strong>`
+        score.innerHTML = (data.mobyScore != null) ? data.mobyScore : 0;
+        if (data.mobyScore % 1 == 0) score.innerHTML += `.0`
+        scoreContainer.appendChild(score);
+        scoreContainer.appendChild(scoreLabel);
+        gameElement.appendChild(scoreContainer);
+        
+        // Append to document fragment
+        fragment.appendChild(gameElement);
+    });
+
+    list.appendChild(fragment);
+} 
+
+
+// Extract game data
+function extractData(game) {
+    // Default data attributes
+    let gameCover = 'default-cover.jpg';
+    let gameTitle = 'Untitled Game';
+    let gameId = 'N/A';
+    let mobyScore = 'N/A';
+    let releaseDate = 'Unknown Release Date';
+    let genres = 'Unknown Genre';
+
+    // Check if data exists before updating 
+    if (game.sample_cover && game.sample_cover.image) {
+        gameCover = game.sample_cover.image;
+    }
+    if (game.title) {
+        gameTitle = game.title;
+    }
+    if (game.game_id) {
+        gameId = game.game_id;
+    }
+    if (game.moby_score) {
+        mobyScore = game.moby_score;
+    }
+    if (game.platforms && game.platforms[0] && game.platforms[0].first_release_date) {
+        releaseDate = game.platforms[0].first_release_date;
+    }
+    if (game.genres) {
+        genres = game.genres;
+        console.log(genres)
+    }
+
+    return { 
+        gameCover: gameCover,
+        gameTitle: gameTitle,
+        gameId: gameId,
+        mobyScore: mobyScore, 
+        releaseDate: releaseDate,
+        genres: genres  
     }
 }

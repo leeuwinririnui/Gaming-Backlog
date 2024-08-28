@@ -59,7 +59,7 @@ export function gamePage() {
         window.location.href = `/game?id=${gameId}`;
     };
 
-    const gameElements = document.querySelectorAll('.game-title, .game-cover');
+    const gameElements = document.querySelectorAll('.title, .game-cover');
 
     gameElements.forEach(element => {
         element.addEventListener('click', handleRedirect);
