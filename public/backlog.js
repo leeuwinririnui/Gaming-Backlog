@@ -144,7 +144,7 @@ function populateList(games, list) {
         const date = document.createElement('p');
         dateContainer.classList.add('date-container');
         date.classList.add('date');
-        date.innerHTML = `Released: <strong>${data.releaseDate}<strong>`;
+        date.innerHTML = `Released: <strong>${data.releaseDate}</strong>`;
         dateContainer.appendChild(date);
 
         const genreContainer = document.createElement('div');
@@ -196,15 +196,16 @@ function populateList(games, list) {
         // Create score elements
         const scoreContainer = document.createElement('div');
         const scoreLabel = document.createElement('p');
+        const scoreBox = document.createElement('div');
         const score = document.createElement('p');
         scoreContainer.classList.add('score-container');
-        scoreLabel.classList.add('score-label');
+        // scoreLabel.classList.add('score-label');
         score.classList.add('score');
-        scoreLabel.innerHTML = `<strong>Score<strong>`
+        // scoreLabel.innerHTML = `<strong>Score</strong>`
         score.innerHTML = (data.mobyScore != null) ? data.mobyScore : 0;
         if (data.mobyScore % 1 == 0) score.innerHTML += `.0`
         scoreContainer.appendChild(score);
-        scoreContainer.appendChild(scoreLabel);
+        // scoreContainer.appendChild(scoreLabel);
         gameElement.appendChild(scoreContainer);
         
         // Append to document fragment
@@ -218,7 +219,7 @@ function populateList(games, list) {
 // Extract game data
 function extractData(game) {
     // Default data attributes
-    let gameCover = 'default-cover.jpg';
+    let gameCover = 'default-cover.jpg'; // FIND AN IMAGE TO USE AS DEFAULT
     let gameTitle = 'Untitled Game';
     let gameId = 'N/A';
     let mobyScore = 'N/A';
@@ -243,7 +244,6 @@ function extractData(game) {
     }
     if (game.genres) {
         genres = game.genres;
-        console.log(genres)
     }
 
     return { 

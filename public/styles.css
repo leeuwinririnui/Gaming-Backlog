@@ -8,12 +8,13 @@
     --bad-red: #F25858;
     --bad-red-darker: #D14747;
 
+    --text-dark: #333333;
+
     --secondary-yellow: #FFD369;
     --dark-bg: #2C2F33;
     --light-gray-accent: #99AAB5; 
     --dark-gray-accent: #4F545C;
     --lighter-gray: #DCDDDE; 
-    --white: #FFFFFF; 
     --alternative-dark-bg: #242424; 
   
   
@@ -127,9 +128,18 @@
     padding: 0;
 }
 
+:root {
+    --text-color: #333333;
+}
+
 body {
     min-height: 100vh;
     font-family: 'Roboto', sans-serif;
+    color: var(--text-color);
+}
+
+strong {
+    color: black;
 }
 
 /* Nav section */
@@ -138,8 +148,9 @@ nav {
     display: flex;
     background-color: var(--alternative-dark-bg);
     box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.1);
-    padding: var(--padding-small) var(--padding-large);
+    
     height: 8vh;
+    
 }
 
 nav ul {
@@ -148,6 +159,11 @@ nav ul {
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    --max-width: 1110px;
+    --padding: 1rem;
+    width: min(var(--max-width), 100% - var(--padding) * 2);
+    /* left and right */
+    margin-inline: auto; 
 }
 
 nav li {
@@ -247,9 +263,6 @@ input[type=search] {
 }
 
 @media(min-width: 800px) {
-    nav {
-        padding: var(--padding-small) 20em;
-    }
 
     nav ul {
         display: flex;
@@ -263,11 +276,18 @@ input[type=search] {
 }
 
 /* Main body/container */
-
 .main-container {
     min-height: 92vh;
-    padding: var(--padding-xxlarge) var(--padding-large) ;
     background-color: white;
+
+    padding: 4em 0;
+    /* border: 2px solid blue; */
+    --max-width: 1110px;
+    --padding: 1rem;
+
+    width: min(var(--max-width), 100% - var(--padding) * 2);
+    /* left and right */
+    margin-inline: auto; 
 }
 
 /* Results section */
@@ -290,20 +310,6 @@ input[type=search] {
     text-overflow: ellipsis; 
 }
 
-@media(min-width: 800px) {
-    .games-list {
-        display: flex;
-        flex-wrap: wrap;
-        height: auto;
-        gap: 4%;
-    }
-
-    .game {
-        width: 48%; 
-    }
-    
-}
-
 /* Game listing */
 .games-list {
     height: auto;
@@ -313,7 +319,7 @@ input[type=search] {
     margin: 0.5em 0;
     display: flex;
     justify-content: start;
-    align-items: start;
+    align-items: center;
     height: 10em;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     background-color: white;
@@ -327,12 +333,16 @@ input[type=search] {
     align-items: center;
     height: 100%;
     width: 30%;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 
 .game-cover {
-    width: 7em; 
-    height: 7em; 
+    width: 80%; 
+    max-width: 80%; 
+    height: 80%;
+    max-height: 80%;
     object-fit: cover; 
     object-position: center; 
     border-radius: 4px;
@@ -347,8 +357,9 @@ input[type=search] {
 .game-info {
     display: flex;
     flex-direction: column;
-    padding: 1.55em 0.65em;
-    height: 100%;
+    gap: 0.5em;
+    padding: 0 0.65em;
+    height: 80%;
     width: 50%;
     /* border: 2px solid red; */
 }
@@ -356,12 +367,12 @@ input[type=search] {
 .title-container {
     display: flex;
     /* border: 2px solid red; */
-    width: 90%;
+    width: 100%;
 }
 
 .title {
-    font-weight: var(--font-weight-semi-bold);
-    font-size: var(--font-size-large);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-medium);
     letter-spacing: 0.0.5em;
     white-space: nowrap;
     overflow: hidden; 
@@ -378,7 +389,7 @@ input[type=search] {
 .date-container {
     display: flex;
     /* border: 2px solid red; */
-    width: 70%;
+    width: 100%;
 }
 
 .date {
@@ -392,11 +403,13 @@ input[type=search] {
 
 .genre-container {
     display: flex;
-
+    width: 100%;
 }
 
 .genre {
     font-size: var(--font-size-xsmall);
+    text-overflow: ellipsis; 
+    width: 100%;
 }
 
 .button-container {
@@ -407,7 +420,7 @@ input[type=search] {
 }
 
 .add-button, .remove-button {
-    padding: 10px 20px;
+    padding: 10px 5px;
     font-size: var(--font-size-xsmall);
     font-weight: 500;
     color: var(--color-white);
@@ -415,7 +428,7 @@ input[type=search] {
     border: none;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     text-align: center;
-    width: 8em;
+    width: 6em;
 }
 
 .add-button {
@@ -451,24 +464,27 @@ input[type=search] {
 }
 
 .score {
-    color: black;
     display: flex;
-    font-size: 3em;
+    font-size: 2.25em;
     font-weight: var(--font-weight-semi-bold);
     border-radius: 4px;
     /* border: 2px solid red; */
 }
 
 .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 5em;
+
     text-align: center;
 }
 
 .pagination a {
-    color: black;
     text-decoration: none;
     padding: 15px 12px;
     display: inline-block;
-    font-size: var(--font-size-large);
+    font-size: var(--font-size-xlarge);
     font-weight: var(--font-weight-light);
 }
 
@@ -508,50 +524,33 @@ footer ul li a {
     color: var(--white);
 }
 
-@media(min-width: 1200px) {
-    .main-container {
-        padding: var(--padding-xxxlarge) 20em;
-    }
+/* Tablet styles (768px to 1024px) */
+@media (min-width: 768px) {
+    body {
+        .games-list {
+            display: flex;
+            flex-wrap: wrap;
+            height: auto;
+            gap: 4%;
+        }
     
-    .game {
-        height: 12em;
+        .game {
+            width: 48%; 
+        }
+        
     }
+}
 
-    .game-info {
-        padding: 1.05em 0;
-        width: 45%;
-    }
-
-    .cover-container {
-        width: 35%;
-    }
-
-    .game-cover {
-        width: 10em; 
-        height: 10em; 
-    }
-
+/* Desktop styles (1025px and above) */
+@media (min-width: 1025px) {
     .title {
         letter-spacing: 0.0.5em;
         width: 100%;
     }
 
-    .add-button, .remove-button {
-        padding: 10px 20px;
-        font-size: var(--font-size-medium);
-        color: var(--color-white);
-        border-radius: 6px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-
-    .score-container {
-        width: 20%;
-    }
     
     .score {
-        color: black;
-        font-size: 2.5em;
-        font-weight: var(--font-weight-semi-bold);
+        font-weight: 700;
     }
 }
 

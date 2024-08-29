@@ -159,8 +159,6 @@ const removeGame = async (req, res, next) => {
             return res.status(404).json({ message: "Game was not found in users list" });
         }
 
-        console.log("MAde it this far")
-        
         console.log("Game successfully removed from list");
         return res.status(200).json({ message: "Game successfully removed from list" });
 
@@ -200,10 +198,6 @@ const checkGame = async (req, res, next) => {
 const fetchList = async (req, res, next) => {
     try {
         const { page, title } = req.query;
-
-        console.log(page);
-
-        console.log(req.query);
 
         if (!page) {
             return res.status(400).json({ message: 'Page not found' });
@@ -245,7 +239,6 @@ const fetchList = async (req, res, next) => {
         const response =  await fetch(url);
 
         if (!response.ok) {
-            console.log(response);
             return response.status(400).json({ message: "Game data was not retrieved" });
         }
 
