@@ -7,6 +7,10 @@ router.get('/', userAuth, (req, res) => {
     res.sendFile(path.join(__dirname, '..', '..', 'views', 'home.html'));
 });
 
+router.get('/search', userAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, '..', '..', 'views', 'search.html'));
+});
+
 router.get('/login', verifyAuth, (req, res) => {
     res.sendFile(path.join(__dirname, '..', '..', 'views', 'login.html'));
 });

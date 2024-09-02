@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Games</title>
-    <script src="/search.js" type="module"></script>
+    <script src="/home.js" type="module"></script>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
         <ul class="sidebar">
             <li onclick=hideSideBar()><a href="#"><svg xmlns="http://www.w3.org/2000/svg" height="26px" viewBox="0 -960 960 960" width="26px" fill="#e8eaed"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg></a></li>
             <li><a href="/">GameVault</a></li>
-            <li><a href="/">Home</a></li>
+            <li><a href="/search">Search</a></li>
             <li><a href="/list">Backlog</a></li>
             <li><a href="/logout">Logout</a></li>
         </ul>
@@ -27,25 +27,19 @@
                 <input id="search-game" type="search" placeholder="Search a game">
                 <img id="search-button" src="images/search.svg" alt="search-icon" width="24" height="24">
             </div>
-            <li class="hideOnMobile"><a href="/">Home</a></li>
+            <li class="hideOnMobile"><a href="/search">Search</a></li>
             <li class="hideOnMobile"><a href="/list">Backlog</a></li>
             <li class="hideOnMobile"><a href="/logout">Logout</a></li>
             <li class="menu-button" onclick=showSideBar()><a href="#"><svg xmlns="http://www.w3.org/2000/svg" height="26px" viewBox="0 -960 960 960" width="26px" fill="#e8eaed"><path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/></svg></a></li>
         </ul>
     </nav>
     <div class="main-container">
-        <div class="search-message">
-            <p id="search-results">Search for a Game...</p>
+        <div class="top-popular">
+            <div id="loader" class="hidden"></div> 
+            <p id="popular-label">Random Picks</p>
         </div>
-        <div id="games-list" class="games-list">
-            <!-- Games will be shown here -->
+        <!-- Populate random picks -->
 
-        </div>
-
-        <div class="pagination">
-            <!-- Pagination links will be inserted -->
-        </div>
-    
     </div>
 
     <footer>

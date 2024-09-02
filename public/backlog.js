@@ -26,11 +26,18 @@ function setupSearch() {
     const searchButton = document.querySelector('#search-button');
 
     const searchList = async () => {
+        if (searchInput.value.trim() == "") {
+            return;
+        }
+        document.querySelector('#loader').classList.remove('hidden');
+        document.querySelector('#search-results').innerHTML = `Searching...`;
         // Set active page to first (0) for each new search
         page = 0;
         // Ensure all users games are retrieved before adding links
         await getUserList(searchInput.value.trim());
         addPaginationLinks(gameCount, searchInput.value.trim());
+        document.querySelector('#search-results').innerHTML = `Search results for <strong>"${searchInput.value.trim()}"<strong>`
+        document.querySelector('#loader').classList.add('hidden');
     }
 
     searchButton.addEventListener('click', () => {
@@ -195,8 +202,6 @@ function populateList(games, list) {
         
         // Create score elements
         const scoreContainer = document.createElement('div');
-        const scoreLabel = document.createElement('p');
-        const scoreBox = document.createElement('div');
         const score = document.createElement('p');
         scoreContainer.classList.add('score-container');
         // scoreLabel.classList.add('score-label');

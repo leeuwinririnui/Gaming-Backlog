@@ -25,15 +25,19 @@ function setupSearch() {
 
     const handleSearch = async () => {
         if (searchInput.value.trim() === "") {
-            document.querySelector('#search-results').innerHTML = `No Title Found`;
             return;
         }
+
+        document.querySelector('#loader').classList.remove('hidden');
+        document.querySelector('#search-results').innerHTML = `Searching...`;
+
         // Set active page to first (0) for each new search
         page = 0;
         // Ensure games have been retrieve before setting pagination links
         await searchGames(searchInput.value.trim());
         addPaginationLinks(gameCount, searchInput.value.trim())
         document.querySelector('#search-results').innerHTML = `Search results for <strong>"${searchInput.value.trim()}"<strong>`
+        document.querySelector('#loader').classList.add('hidden');
     }
 
     searchButton.addEventListener('click', () => {
@@ -198,17 +202,12 @@ function populateList(games, list) {
         
         // Create score elements
         const scoreContainer = document.createElement('div');
-        const scoreLabel = document.createElement('p');
-        const scoreBox = document.createElement('div');
         const score = document.createElement('p');
         scoreContainer.classList.add('score-container');
-        // scoreLabel.classList.add('score-label');
         score.classList.add('score');
-        // scoreLabel.innerHTML = `<strong>Score<strong>`
         score.innerHTML = (data.mobyScore != null) ? data.mobyScore : 0;
         if (data.mobyScore % 1 == 0) score.innerHTML += `.0`
         scoreContainer.appendChild(score);
-        // scoreContainer.appendChild(scoreLabel);
         gameElement.appendChild(scoreContainer);
         
         // Append to document fragment

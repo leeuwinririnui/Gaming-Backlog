@@ -8,9 +8,13 @@ const {
     checkGame, 
     removeGame, 
     fetchList, 
+    fetchRandom,
+    fetchTopGamesThisYear
 } = require("../controllers/moby");
 
 router.route("/retrieve").get(fetchGames);
+router.route("/random").get(fetchRandom);
+router.route("/current").get(fetchTopGamesThisYear);
 router.route("/info").get(gamePage);
 router.route("/add").post(addGame);
 router.route("/check").get(checkGame);

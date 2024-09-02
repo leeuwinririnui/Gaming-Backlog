@@ -30,6 +30,6 @@ const UserSchema = new Mongoose.Schema({
     ], 
 });
 
-const User = Mongoose.model("user", UserSchema);
+const User = Mongoose.model("User", UserSchema);
 
 module.exports = User;

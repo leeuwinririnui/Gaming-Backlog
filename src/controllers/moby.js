@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../data/user');
+const fs = require('fs').promises;
 const endpoint = 'https://api.mobygames.com/v1/games';
 const { 
     filterGamesByTitle, 
@@ -12,7 +13,11 @@ const {
 } = require('../../config.js');
 const chunk = 20;
 
-// Fetch games from Mobygames api 
+function wait(time) {
+    return new Promise(resolve => setTimeout(resolve, time));
+}
+
+// Fetch games using title 
 const fetchGames = async (req, res, next) => {
     const { title, page } = req.query;
 
@@ -57,6 +62,79 @@ const fetchGames = async (req, res, next) => {
         
     } catch (error) {
         res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
+// Fetch random games
+const fetchRandom = async (req, res, next) => {
+
+    const url = `${endpoint}/random?api_key=${MOBY_API}&limit=20`;
+    
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            return res.status(response.status).json({ 
+                message: "Games were not found or there was an error with the request"
+             });
+        }
+
+        const data = await response.json();
+
+        let ids = '';
+        
+        data.games.forEach(game => {
+            ids += `&id=${encodeURIComponent(game)}`;
+        });
+
+        await wait(1000);
+
+        const urlRecent = `${endpoint}?api_key=${MOBY_API}` + ids;
+        
+        const randomRes = await fetch(urlRecent);
+
+        if (!randomRes.ok) {
+            return res.status(randomRes.status).json({ 
+                message: "Games were not found or there was an error with the request"
+             });
+        }
+
+        const random = await randomRes.json();
+
+        return res.status(200).json({ games: random.games });
+
+    } catch (error) {
+        return res.status(500).json({ message: "Error", error });
+    }
+}
+
+// Fetch top games of current year (Metacritic)
+const fetchTopGamesThisYear = async (req, res, next) => {
+    try {
+        const metacriticData = await fs.readFile('src/data/metacritic.json', 'utf-8');
+
+        const gamesData = JSON.parse(metacriticData);
+
+        let url = `${endpoint}?api_key=${MOBY_API}&limit=20`;
+
+        gamesData.forEach(title => {
+            url += `&title=${encodeURIComponent(String(title))}`;
+        })
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            return res.status(response.status).json({
+                message: "Failed to retrieve game data"
+            });
+        }
+
+        const data = await response.json();
+
+        return res.status(200).json(data);
+
+    } catch (error) {
+        return res.status(500).json({ message: "Error", error });
     }
 }
 
@@ -231,8 +309,6 @@ const fetchList = async (req, res, next) => {
 
         const dividedGames = divideArray(gamesToFetch, chunk);
 
-        console.log(gamesToFetch);
-
         dividedGames[page].forEach(gameId => { endpoints += `&id=${encodeURIComponent(gameId)}` });
         const url = `${endpoint}?api_key=${MOBY_API}` + endpoints;
 
@@ -292,4 +368,6 @@ module.exports = {
     checkGame,
     removeGame, 
     fetchList,
+    fetchRandom,
+    fetchTopGamesThisYear
 };

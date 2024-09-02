@@ -88,65 +88,116 @@ function extractData(game) {
 
 // Render page with game data
 function renderGameData(cover, screenshots, title, genres, description, date, platforms, score) {
+    // Main container
+    const gamePageContainer = document.querySelector('.game-page-container');
+
+    // Container for game cover and screenshots
+    const topContainer = document.createElement('div');
+    topContainer.classList.add('top-container');
+    gamePageContainer.appendChild(topContainer);
+    
     // Create and append game cover
-    const coverContainer = document.querySelector('.cover-container');
+    const coverContainer = document.createElement('div');
     const gameCover = document.createElement('img');
+    coverContainer.classList.add('box-container')
     gameCover.src = cover;
     gameCover.alt = `Cover of ${title}`;
-    gameCover.classList.add('game-cover');
+    gameCover.classList.add('box-cover');
     coverContainer.appendChild(gameCover);
+    topContainer.appendChild(coverContainer);
+
+    const topInfoContainer = document.createElement('div');
+    topInfoContainer.classList.add('top-info-container');
+    topContainer.appendChild(topInfoContainer)
+
+    const descriptionContainer = document.createElement('div');
+    const descriptionLabel = document.createElement('p');
+    const descriptionLabelContainer = document.createElement('div');
+    const gameDescription = document.createElement('p');
+    descriptionContainer.classList.add('description-container');
+    descriptionLabelContainer.classList.add('description-label-container');
+    descriptionLabel.classList.add('description-label');
+    gameDescription.classList.add('description');
+    gameDescription.innerHTML = description;
+    descriptionLabel.innerHTML = `Description`;
+    descriptionLabelContainer.appendChild(descriptionLabel);
+    gamePageContainer.appendChild(descriptionLabelContainer);
+    descriptionContainer.appendChild(gameDescription);
+    gamePageContainer.append(descriptionContainer);
 
     // Create and append sample screenshots
-    const screenshotContainer = document.querySelector('.screenshot-container');
-    screenshots.forEach(screenshot => {
-        const gameScreenshot = document.createElement('img');
-        gameScreenshot.src = screenshot.image;
-        gameScreenshot.alt = `Sample of ${title}`;
-        gameScreenshot.classList.add('screenshot');
-        screenshotContainer.appendChild(gameScreenshot);
-    });
-
+    if (screenshots.length > 0) {
+        const screenshotContainer = document.createElement('div');
+        screenshotContainer.classList.add('screenshot-container');
+        screenshots.forEach(screenshot => {
+            const gameScreenshot = document.createElement('img');
+            gameScreenshot.src = screenshot.image;
+            gameScreenshot.alt = `Sample of ${title}`;
+            gameScreenshot.classList.add('screenshot');
+            screenshotContainer.appendChild(gameScreenshot);
+        });
+        gamePageContainer.append(screenshotContainer);
+    }
+    
     // Create and append game title
-    const titleContainer = document.querySelector('.title-container');
+    const titleContainer = document.createElement('div');
     const gameTitle = document.createElement('p');
+    titleContainer.classList.add('game-title-container')
     gameTitle.innerHTML = title;
-    gameTitle.classList.add('title');
+    gameTitle.classList.add('game-title');
     titleContainer.appendChild(gameTitle);
+    topInfoContainer.appendChild(titleContainer);
 
     // Create and append game score
-    const scoreContainer = document.querySelector('.score-container');
+    const scoreContainer = document.createElement('div');
     const gameScore = document.createElement('p');
+    scoreContainer.classList.add('score-container')
     gameScore.innerHTML = `Moby Score: ${score}`;
     gameScore.classList.add('moby-score');
     scoreContainer.appendChild(gameScore);
 
-    // Create and append platforms
-    const platformContainer = document.querySelector('.platform-container');
-    platforms.forEach(platform => {
-        const gamePlatform = document.createElement('p');
-        gamePlatform.innerHTML = `${platform.platform_name}: <strong>${platform.first_release_date}<strong>`;
-        gamePlatform.classList.add('platform');
-        platformContainer.appendChild(gamePlatform);
-    });
+    const platformGenreContainer = document.createElement('div');
+    platformGenreContainer.classList.add('platform-genre-container');
 
     // Create and append genres
-    const genreContainer =  document.querySelector('.genre-container');
+    const genreContainer =  document.createElement('div');
+    const genreLabel = document.createElement('p');
+    genreContainer.classList.add('page-genre-container');
+    genreLabel.classList.add('genre-label')
+    genreLabel.textContent = `Genres`;
+    genreContainer.appendChild(genreLabel);
     genres.forEach(genre => {
         const gameGenre = document.createElement('p');
         gameGenre.innerHTML = `${genre.genre_name}`;
-        gameGenre.classList.add('genre');
+        gameGenre.classList.add('page-genre');
         genreContainer.appendChild(gameGenre);
     });
+    platformGenreContainer.appendChild(genreContainer);
+
+    // Create and append platforms
+    const platformContainer = document.createElement('div');
+    const platformLabel = document.createElement('p');
+    platformContainer.classList.add('platform-container');
+    platformLabel.classList.add('platform-label');
+    platformLabel.textContent = `Platforms`;
+    platformContainer.appendChild(platformLabel);
+    platforms.forEach(platform => {
+        const gamePlatform = document.createElement('p');
+        gamePlatform.innerHTML = `<strong>${platform.platform_name}:</strong> ${platform.first_release_date}`;
+        gamePlatform.classList.add('platform');
+        platformContainer.appendChild(gamePlatform);
+    });
+    platformGenreContainer.appendChild(platformContainer);
+
+    topInfoContainer.appendChild(platformGenreContainer)
 
     // Create and append description
-    const descriptionContainer = document.querySelector('.description-container');
-    const gameDescription = document.createElement('p');
-    gameDescription.innerHTML = description;
-    gameDescription.classList.add('description');
-    descriptionContainer.appendChild(gameDescription);
+    // gamePageContainer.appendChild(descriptionContainer);
 
     // Create and append add and remove buttons
-    const buttonContainer = document.querySelector('.button-container');
+    const buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('button-container')
+    // gamePageContainer.appendChild(buttonContainer);
 
     const addButton = document.createElement('button');
     addButton.innerHTML = `Add`;
