@@ -20,9 +20,9 @@ const register = async (req, res, next) => {
     try {
         const existingUser = await User.findOne({ username });
         if (existingUser) {
-            console.log("Username already exists");
+            console.log("User already exists");
             return res.status(400).json({
-                message: "Username already exists"
+                message: "User already exists"
             });
         }
 

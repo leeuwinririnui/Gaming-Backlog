@@ -2,20 +2,28 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('form');
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', async (event) => {
         // Retrieve user info
         const username = document.querySelector('#username');
         const password = document.querySelector('#password');
+        const confirm = document.querySelector('#confirm-password');
         const display = document.querySelector('#error');
 
-        console.log(`${username.value}`);
-        console.log(`${password.value}`);
+        console.log(`Username: ${username.value}`);
+        console.log(`Password: ${password.value}`);
+        console.log(`Confirm Password: ${confirm.value}`);
 
-        e.preventDefault();
+        event.preventDefault();
 
         display.textContent = '';
 
         try {
+
+            if (password.value != confirm.value) {
+                display.textContent = `Passwords do not match`;
+
+                return;
+            }
             // Send POST request to api/auth/register
             const res = await fetch('api/auth/register', {
                 method: 'POST',
@@ -27,13 +35,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
 
             // Handle errors
-            if (res.status === 400 || res.status === 401) {
+            if (!res.ok) {
                 display.textContent = `${data.message}`;
                 if (data.error) { 
                     display.textContent += `${data.error}`; 
                 } 
 
-                return display.textContent;
+                return;
             }
         
             console.log('User successfully created', data);

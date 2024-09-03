@@ -2,7 +2,6 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
 const path = 'src/data/metacritic.json';
-const cron = ('node-cron');
 
 const currentYearURL = 'https://www.metacritic.com/browse/game/all/all/current-year/';
 

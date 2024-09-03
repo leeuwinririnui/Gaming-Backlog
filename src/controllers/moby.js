@@ -67,8 +67,7 @@ const fetchGames = async (req, res, next) => {
 
 // Fetch random games
 const fetchRandom = async (req, res, next) => {
-
-    const url = `${endpoint}/random?api_key=${MOBY_API}&limit=20`;
+    const url = `${endpoint}/random?api_key=${MOBY_API}&limit=50`;
     
     try {
         const response = await fetch(url);
@@ -330,6 +329,28 @@ const fetchList = async (req, res, next) => {
     }
 }
 
+// Fetch username 
+const fetchUsername = async (req, res, next) => {
+    try {
+        const user =  await fetchUser(req.cookies.jwt);
+
+        if (!user) {
+            return res.status(400).json({
+                message: "Could not retrieve username"
+            });
+        } 
+
+        return res.status(200).json({
+            username: user.username
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "Error", error
+        })
+    }
+}
+
 // ----------------------- HELPER FUNCTIONS -----------------------
 
 // Fetch user from db
@@ -369,5 +390,5 @@ module.exports = {
     removeGame, 
     fetchList,
     fetchRandom,
-    fetchTopGamesThisYear
+    fetchUsername
 };

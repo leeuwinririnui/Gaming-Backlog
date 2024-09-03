@@ -125,6 +125,12 @@ function renderGameData(cover, screenshots, title, genres, description, date, pl
     descriptionContainer.appendChild(gameDescription);
     gamePageContainer.append(descriptionContainer);
 
+    // Create and append add and remove buttons
+    const buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('game-page-button-container');
+    gamePageContainer.appendChild(buttonContainer);
+
+
     // Create and append sample screenshots
     if (screenshots.length > 0) {
         const screenshotContainer = document.createElement('div');
@@ -189,15 +195,7 @@ function renderGameData(cover, screenshots, title, genres, description, date, pl
     });
     platformGenreContainer.appendChild(platformContainer);
 
-    topInfoContainer.appendChild(platformGenreContainer)
-
-    // Create and append description
-    // gamePageContainer.appendChild(descriptionContainer);
-
-    // Create and append add and remove buttons
-    const buttonContainer = document.createElement('div');
-    buttonContainer.classList.add('button-container')
-    // gamePageContainer.appendChild(buttonContainer);
+    topInfoContainer.appendChild(platformGenreContainer);
 
     const addButton = document.createElement('button');
     addButton.innerHTML = `Add`;

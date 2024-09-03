@@ -1,21 +1,32 @@
 
-import { 
-    removeGame,
-    addGame,
-    gamePage, 
-    scrollToTop,
-    handleSiblings, 
-    hideLinks 
-} from "./helper.js";
-
-
 document.addEventListener('DOMContentLoaded', () => {
+    fetchUsername();
     fetchGames();
-
 });
 
+async function fetchUsername() {
+    const header = document.getElementById('welcome');
+    
+    try {
+        const res = await fetch(`api/game/name`, {
+            method: 'GET',
+            headers: { 'content-type': 'application/json' }
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new error(data.message);
+        }
+        
+        header.textContent += ` ${data.username}!`;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 // Fetch games based on type paramete (genre, popularity, etc...)
-async function fetchGames(type) {
+async function fetchGames() {
     try {
         const res = await fetch(`api/game/random`, {
             method: 'GET',
@@ -38,42 +49,61 @@ function fillRecent(games) {
     if (games) {
         const mainContainer = document.querySelector('.main-container');
 
-        // Recent game container
-        const randomGameContainer = document.createElement('div');
-        randomGameContainer.classList.add('random-container');
-        mainContainer.appendChild(randomGameContainer);
-        games.forEach(game => {
-            // Extract game data
-            let data = extractData(game);
+        // Create section for games
+        const createGameSection = (gameChunk) => {
 
-            if (data.gameCover) {     
+            // Recent game container
+            const randomGameContainer = document.createElement('div');
+            randomGameContainer.classList.add('random-container');
+            mainContainer.appendChild(randomGameContainer);
+            gameChunk.forEach(game => {
+                // Extract game data
+                let data = extractData(game);
 
-                // Create container element for each individual game
-                const randomFrame = document.createElement('div');
-                randomFrame.classList.add('random-frame');
-                randomGameContainer.appendChild(randomFrame);
+                if (data.gameCover) {     
 
-                // Create and append a blurred version of game cover for background
+                    // Create container element for each individual game
+                    const randomFrame = document.createElement('div');
+                    randomFrame.classList.add('random-frame');
+                    randomGameContainer.appendChild(randomFrame);
 
-                // Create and append game image cover element
-                const randomGameImage = document.createElement('img');
-                randomGameImage.classList.add('random-image');
-                randomGameImage.src = data.gameCover;
-                randomFrame.appendChild(randomGameImage);
+                    // Create and append a blurred version of game cover for background
 
-                // Create and append title element
-                const titleContainer = document.createElement('div');
-                const gameTitle = document.createElement('p');
-                titleContainer.classList.add('home-title-container');
-                gameTitle.classList.add('home-game-title');
-                gameTitle.innerHTML = `${data.gameTitle}`;
-                titleContainer.appendChild(gameTitle);
-                randomFrame.appendChild(titleContainer);
+                    // Create and append game image cover element
+                    const randomGameImage = document.createElement('img');
+                    randomGameImage.classList.add('random-image');
+                    randomGameImage.src = data.gameCover;
+                    randomFrame.appendChild(randomGameImage);
 
-                // Add redirect handler for title and cover
-                handleRedirect(data.gameId, randomGameImage, gameTitle)
+                    // Create and append title element
+                    const titleContainer = document.createElement('div');
+                    const gameTitle = document.createElement('p');
+                    titleContainer.classList.add('home-title-container');
+                    gameTitle.classList.add('home-game-title');
+                    gameTitle.innerHTML = `${data.gameTitle}`;
+                    titleContainer.appendChild(gameTitle);
+                    randomFrame.appendChild(titleContainer);
+
+                    // Create and append score element
+                    const scoreContainer = document.createElement('div');
+                    const gameScore = document.createElement('p');
+                    scoreContainer.classList.add('home-score-container');
+                    gameScore.classList.add('home-score');
+                    gameScore.innerHTML = `${data.mobyScore}`;
+                    scoreContainer.append(gameScore);
+                    randomFrame.appendChild(scoreContainer);
+
+                    // Add redirect handler for title and cover
+                    handleRedirect(data.gameId, randomGameImage, gameTitle)
+                }
+            });
+        }
+
+        const chunkSize = 5;
+            for (let i = 0; i < games.length; i += chunkSize) {
+                const gameChunk = games.slice(i, i + chunkSize);
+                createGameSection(gameChunk);
             }
-        });
     }
 }
 

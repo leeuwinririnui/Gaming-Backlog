@@ -18,63 +18,50 @@
 
 <body>
     <nav>
-        <ul class="sidebar">
-            <li onclick=hideSideBar()><a href="#"><svg xmlns="http://www.w3.org/2000/svg" height="26px" viewBox="0 -960 960 960" width="26px" fill="#e8eaed"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg></a></li>
-            <li><a href="/">GameVault</a></li>
-            <li><a href="/search">Search</a></li>
-            <li><a href="/list">Backlog</a></li>
-            <li><a href="/logout">Logout</a></li>
-        </ul>
         <ul>
-            <li class="hideOnMobile"><a href="/">GameVault</a></li>
-            <div class="search-container">
-                <input id="search-game" type="search" placeholder="Search a game...">
-                <img id="search-button" src="images/search.svg" alt="search-icon" width="24" height="24">
-            </div>
-            <li class="hideOnMobile"><a href="/search">Search</a></li>
-            <li class="hideOnMobile"><a href="/list">Backlog</a></li>
-            <li class="hideOnMobile"><a href="/logout">Logout</a></li>
-            <li class="menu-button" onclick=showSideBar()><a href="#"><svg xmlns="http://www.w3.org/2000/svg" height="26px" viewBox="0 -960 960 960" width="26px" fill="#e8eaed"><path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/></svg></a></li>
+            <li><a href="#">GameVault</a></li>
         </ul>
     </nav>
-    <div class="main-container">
-        <form action="">
-            <div class="container">
-                <div class="heading">
-                    <h1>Login</h1>
-                    <p>Good to see you again</p>
+    <div class="main-container-form">
+        <div class="form-container">
+            <div class="form-header">
+                <p>Login</p>
+            </div>
+            <form class="account-form" action="">
+                
+                <div class="label-container">
+                    <!-- Username section -->
+                    <label for="username">Username</label>
                 </div>
-
-                <!-- Username section -->
-                <label for="username" style="text-transform: capitalize;">Username</label>
                 <div class="input-container">
                     <!-- <img src="images/person.svg" alt="icon" width="24" height="24" class="input-icon"> -->
-                    <input id="username" type="text" placeholder="Enter username" name="username" required>
+                    <input class="input-field" id="username" type="text" placeholder="Enter username" name="username" required>
                 </div>
-
+    
                 <!-- Password section -->
-                <label for="password" style="text-transform: capitalize;">Password</label>
+                <div class="label-container">
+                    <label for="password">Password</label>
+                </div>
                 <div class="input-container">
                     <!-- <img src="images/lock.svg" alt="icon" width="24" height="24" class="input-icon"> -->
-                    <input id="password" type="password" placeholder="Enter password" name="password" required>
+                    <input class="input-field" id="password" type="password" placeholder="Enter password" name="password" required>
                 </div>
-                
-            </div>
-
-            <div class="container">
-                <div class="container">
-                <!-- Login button -->
-                    <button type="submit" id="login-btn">Login</button>
+    
+                <div class="actions-container">
+                    <div class="form-button-container">
+                        <!-- Login button -->
+                        <button class="form-button" type="submit" id="login-btn">Login</button>
+                    </div>
                 </div>
                 <div class="bottom-note">
-                    <!-- Redirect to register page -->
                     <p>Don't have an account? <a href="/register">Register</a></p>
                 </div>
                 <div class="error-container">
                     <p id="error"></p>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
+    
 </body>
 </html>
