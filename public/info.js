@@ -28,7 +28,7 @@ function toSearchPage() {
 
         if (game === "") return;
         
-        window.location.href = `http://localhost:8080/search?title=${game}`;
+        window.location.href = `/search?title=${game}`;
     }
 
     searchButton.addEventListener('click', () => {
