@@ -204,13 +204,18 @@ function populateList(games, list) {
         const scoreContainer = document.createElement('div');
         const score = document.createElement('p');
         scoreContainer.classList.add('score-container');
-        // scoreLabel.classList.add('score-label');
         score.classList.add('score');
-        // scoreLabel.innerHTML = `<strong>Score</strong>`
-        score.innerHTML = (data.mobyScore != null) ? data.mobyScore : 0;
-        if (data.mobyScore % 1 == 0) score.innerHTML += `.0`
+        if (data.mobyScore != 'N/A') score.innerHTML = `${data.mobyScore * 10}`
+        if (data.mobyScore >= 7.5) {
+            scoreContainer.classList.add('good');
+        } 
+        else if (data.mobyScore >= 5) {
+            scoreContainer.classList.add('average');
+        } 
+        else if (data.mobyScore < 5) {
+            scoreContainer.classList.add('bad');
+        }
         scoreContainer.appendChild(score);
-        // scoreContainer.appendChild(scoreLabel);
         gameElement.appendChild(scoreContainer);
         
         // Append to document fragment

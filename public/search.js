@@ -12,9 +12,10 @@ let currentList;
 let page = 0;
 let gameCount = 0;
 
+const queryString = new URLSearchParams(window.location.search);
+
 // Initialize page
-document.addEventListener('DOMContentLoaded', () =>{
-    document.querySelector('#search-game').value = "";
+document.addEventListener('DOMContentLoaded', () => {
     setupSearch();
 });
 
@@ -49,6 +50,14 @@ function setupSearch() {
             handleSearch();
         }
     });
+
+    // Handle case where search has been made from another page
+    if (queryString) {
+        document.querySelector('#search-game').value = queryString.get('title');
+        handleSearch();
+    } else {
+        document.querySelector('#search-game').value = "";
+    }
 }
 
 async function searchGames(title) {
@@ -206,7 +215,16 @@ function populateList(games, list) {
         scoreContainer.classList.add('score-container');
         score.classList.add('score');
         score.innerHTML = (data.mobyScore != null) ? data.mobyScore : 0;
-        if (data.mobyScore % 1 == 0) score.innerHTML += `.0`
+        if (data.mobyScore != 'N/A') score.innerHTML = `${data.mobyScore * 10}`
+        if (data.mobyScore > 7.5) {
+            scoreContainer.classList.add('good');
+        } 
+        else if (data.mobyScore >= 5) {
+            scoreContainer.classList.add('average');
+        } 
+        else if (data.mobyScore < 5) {
+            scoreContainer.classList.add('bad');
+        }
         scoreContainer.appendChild(score);
         gameElement.appendChild(scoreContainer);
         

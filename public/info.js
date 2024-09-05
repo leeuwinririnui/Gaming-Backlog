@@ -14,8 +14,33 @@ let hasGame;
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', () => {
+    toSearchPage();
     gameData();
 });
+
+// Redirect user to search page when search made
+function toSearchPage() {
+    const searchInput = document.querySelector('#search-game');
+    const searchButton = document.querySelector('#search-button');
+
+    const handleSearch = async () => {
+        const game = searchInput.value.trim();
+
+        if (game === "") return;
+        
+        window.location.href = `http://localhost:8080/search?title=${game}`;
+    }
+
+    searchButton.addEventListener('click', () => {
+        handleSearch();
+    });
+    searchInput.addEventListener('keypress', event => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            handleSearch();
+        }
+    });
+}
 
 // Retrieve game information
 async function gameData() {

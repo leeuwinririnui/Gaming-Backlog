@@ -1,8 +1,37 @@
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    document.querySelector('#loader').classList.remove('hidden');
+    document.querySelector('#random-label').innerHTML = `Loading...`;
+    toSearchPage();
     fetchUsername();
-    fetchGames();
+    await fetchGames();
+    document.querySelector('#random-label').innerHTML = `Random Picks`;
+    document.querySelector('#loader').classList.add('hidden');
 });
+
+// Redirect user to search page when search made
+function toSearchPage() {
+    const searchInput = document.querySelector('#search-game');
+    const searchButton = document.querySelector('#search-button');
+
+    const handleSearch = async () => {
+        const game = searchInput.value.trim();
+
+        if (game === "") return;
+        
+        window.location.href = `http://localhost:8080/search?title=${game}`;
+    }
+
+    searchButton.addEventListener('click', () => {
+        handleSearch();
+    });
+    searchInput.addEventListener('keypress', event => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            handleSearch();
+        }
+    });
+}
 
 async function fetchUsername() {
     const header = document.getElementById('welcome');
@@ -75,6 +104,9 @@ function fillRecent(games) {
                     randomGameImage.src = data.gameCover;
                     randomFrame.appendChild(randomGameImage);
 
+                    const scoreTitleContainer = document.createElement('div');
+                    scoreTitleContainer.classList.add('score-title-container')
+                    randomFrame.appendChild(scoreTitleContainer);
                     // Create and append title element
                     const titleContainer = document.createElement('div');
                     const gameTitle = document.createElement('p');
@@ -82,24 +114,34 @@ function fillRecent(games) {
                     gameTitle.classList.add('home-game-title');
                     gameTitle.innerHTML = `${data.gameTitle}`;
                     titleContainer.appendChild(gameTitle);
-                    randomFrame.appendChild(titleContainer);
+                    scoreTitleContainer.appendChild(titleContainer);
+                    
 
                     // Create and append score element
                     const scoreContainer = document.createElement('div');
                     const gameScore = document.createElement('p');
                     scoreContainer.classList.add('home-score-container');
                     gameScore.classList.add('home-score');
-                    gameScore.innerHTML = `${data.mobyScore}`;
+                    gameScore.innerHTML = `${data.mobyScore * 10}`;
                     scoreContainer.append(gameScore);
-                    randomFrame.appendChild(scoreContainer);
+                    scoreTitleContainer.append(scoreContainer);
+                    if (data.mobyScore > 7.5) {
+                        scoreContainer.classList.add('good');
+                    } 
+                    else if (data.mobyScore >= 5) {
+                        scoreContainer.classList.add('average');
+                    } 
+                    else if (data.mobyScore < 5) {
+                        scoreContainer.classList.add('bad');
+                    }
 
                     // Add redirect handler for title and cover
-                    handleRedirect(data.gameId, randomGameImage, gameTitle)
+                    handleRedirect(data.gameId, randomGameImage, gameTitle);
                 }
             });
         }
 
-        const chunkSize = 5;
+        const chunkSize = 10;
             for (let i = 0; i < games.length; i += chunkSize) {
                 const gameChunk = games.slice(i, i + chunkSize);
                 createGameSection(gameChunk);
