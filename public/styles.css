@@ -841,7 +841,7 @@ footer a:hover {
 }
 
 .box-container {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
     display: flex;
     justify-content: center;
     padding: 1.5em 0;
@@ -855,7 +855,7 @@ footer a:hover {
     height: auto;
     object-fit: cover; 
     object-position: center; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
 }
 
 .top-info-container {
@@ -867,7 +867,7 @@ footer a:hover {
     height: 100%;
     gap: 1em;
     width: 100%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
 }
 
 .game-title-container {
@@ -947,7 +947,7 @@ footer a:hover {
     padding: 0 2em 2em 2em;
     max-height: 10em;
     overflow-y: auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
 }
 
 .description {
@@ -972,7 +972,7 @@ footer a:hover {
     max-width: 100%;
     overflow-x: auto;
     height: 15em;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
     /* border: 2px solid red; */
 }
 
@@ -990,8 +990,6 @@ footer a:hover {
         flex-direction: row;
         justify-content: start;
         gap: 1em;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-
     }
 
     .box-container {
