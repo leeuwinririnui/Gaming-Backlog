@@ -2,7 +2,7 @@ const User  = require('../data/user');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../../config.js');
+const JWT_SECRET = process.env.JWT_SECRET;
 const { generateToken } = require('../util.js');
 
 // Register and store user information in db

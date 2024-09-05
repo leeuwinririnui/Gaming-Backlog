@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../config.js');
+const JWT_SECRET = process.env.JWT_SECRET;
 var stringSimilarity = require("string-similarity");
 
 // Match games from users list with title from search 

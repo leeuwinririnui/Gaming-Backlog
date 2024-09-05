@@ -7,10 +7,9 @@ const {
     matchTitles, 
     matchIds 
 } = require('../util.js')
-const { 
-    JWT_SECRET, 
-    MOBY_API 
-} = require('../../config.js');
+const JWT_SECRET = process.env.JWT_SECRET;
+const MOBY_API = process.env.MOBY_API;
+
 const chunk = 20;
 
 function wait(time) {
@@ -42,7 +41,6 @@ const fetchGames = async (req, res, next) => {
         const gameIds = userGames.map(game => game.id);
 
         const response = await fetch(url);
-        
 
         if (!response.ok) {
             return res.status(response.status).json({
@@ -51,7 +49,7 @@ const fetchGames = async (req, res, next) => {
         }
         
         const data = await response.json();
-
+        
         const dividedGames = divideArray(data.games, chunk);
         
         res.status(200).json({ 
@@ -378,7 +376,7 @@ function divideArray(array, chunkSize) {
     if (temp.length > 0) {
         divided.push(temp);
     }
-
+    
     return divided;
 }
 

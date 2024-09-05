@@ -1,3 +1,4 @@
+require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const http = require('http');
@@ -44,7 +45,9 @@ const server = http.createServer(app);
 
 // Start server
 server.listen(8080, () => {
-    console.log('Server is running on port', server.address().port);
+    if (process.env.ENV === 'development') {
+    console.log('Server is running on http://localhost:8080');
+    }
 });
 
 // Error handling for unhandled promise rejections
