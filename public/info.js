@@ -1,18 +1,14 @@
-import { 
-    removeGame, 
-    addGame
-
- } from "./helper.js";
-
 const url = new URL(window.location.href);
 const params = new URLSearchParams(url.search);
 const gameId = params.get('id');
 const encodedId = encodeURIComponent(gameId);
+let gameTitle = ""
+let currentGameStatus = ""
 
 // Check whether game is in users list
 let hasGame;
 
-// Initialize page
+// Initialize page on DOMContentLoaded event
 document.addEventListener('DOMContentLoaded', () => {
     toSearchPage();
     gameData();
@@ -23,6 +19,7 @@ function toSearchPage() {
     const searchInput = document.querySelector('#search-game');
     const searchButton = document.querySelector('#search-button');
 
+    // Function to redirect user
     const handleSearch = async () => {
         const game = searchInput.value.trim();
 
@@ -31,9 +28,12 @@ function toSearchPage() {
         window.location.href = `/search?title=${game}`;
     }
 
+    // Add redirect function to search button
     searchButton.addEventListener('click', () => {
         handleSearch();
     });
+
+    // Add redirect function to search input 
     searchInput.addEventListener('keypress', event => {
         if (event.key === 'Enter') {
             event.preventDefault();
@@ -45,6 +45,7 @@ function toSearchPage() {
 // Retrieve game information
 async function gameData() {
     try {
+        // Fetch game data using id of user
         const res = await fetch(`api/game/info?id=${encodedId}`, {
             method: 'GET',
             headers: { 'content-type': 'application/json' }
@@ -56,11 +57,35 @@ async function gameData() {
             console.log(data.message);
         }
 
+        // Update state variables
+        gameTitle = data.title;
         hasGame = data.hasGame;
+        currentGameStatus = data.status;
+
         extractData(data.game);
 
     } catch (error) {
         console.error(error);
+    }
+}
+
+// function to update status of game
+async function handleStatus(option, id) {
+    const encodedOption = encodeURIComponent(option);
+    const encodedId = encodeURIComponent(id);
+    const encodedHasGame = encodeURIComponent(hasGame);
+    const encodedTitle = encodeURIComponent(gameTitle);
+
+    try {
+        const res = await fetch(`/api/game/status?option=${encodedOption}&id=${encodedId}&title=${encodedTitle}&flag=${encodedHasGame}`, {
+            method: 'PUT',
+            headers: { 'content-type': 'application/json' }
+        });
+
+        const data = await res.json();
+
+    } catch (error) {
+
     }
 }
 
@@ -108,11 +133,11 @@ function extractData(game) {
     }
     
     // Render page
-    renderGameData(gameCover, screenshots, gameTitle, genres, description, releaseDate, platforms, mobyScore, hasGame);
+    renderGameData(gameCover, screenshots, gameTitle, genres, description, releaseDate, platforms, mobyScore, gameId);
 }
 
 // Render page with game data
-function renderGameData(cover, screenshots, title, genres, description, date, platforms, score) {
+function renderGameData(cover, screenshots, title, genres, description, date, platforms, score, id) {
     // Main container
     const gamePageContainer = document.querySelector('.game-page-container');
 
@@ -131,10 +156,49 @@ function renderGameData(cover, screenshots, title, genres, description, date, pl
     coverContainer.appendChild(gameCover);
     topContainer.appendChild(coverContainer);
 
+    // Create and append status container
+    const selectStatusContainer = document.createElement('div');
+    const selectStatus = document.createElement('select');
+    const statuses = ['Completed', 'On Hold', 'Playing'];
+
+    selectStatusContainer.classList.add('status-container');
+    selectStatus.classList.add('status');
+
+    // Add a default empty option
+    if (!hasGame) {
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select Status'; 
+        defaultOption.selected = true;
+        defaultOption.disabled = true; // Prevent selection of the default option
+        selectStatus.appendChild(defaultOption);
+    }
+
+    statuses.forEach(status => {
+        const option = document.createElement('option');
+        option.value = status.toLowerCase();
+        option.textContent = status;
+        if (option.value === currentGameStatus) {
+            option.selected = true;
+        }
+        selectStatus.appendChild(option);
+    });
+    
+    selectStatus.addEventListener('change', (event) => {
+        const selectedOption = event.target.value;
+        handleStatus(selectedOption, id);
+    });
+
+    selectStatusContainer.appendChild(selectStatus);
+
+    gamePageContainer.appendChild(selectStatusContainer);
+
+    // Create and append info container
     const topInfoContainer = document.createElement('div');
     topInfoContainer.classList.add('top-info-container');
     topContainer.appendChild(topInfoContainer)
 
+    // Create and append description container
     const descriptionContainer = document.createElement('div');
     const descriptionLabel = document.createElement('p');
     const descriptionLabelContainer = document.createElement('div');
@@ -187,6 +251,7 @@ function renderGameData(cover, screenshots, title, genres, description, date, pl
     gameScore.classList.add('moby-score');
     scoreContainer.appendChild(gameScore);
 
+    // Create container to hold platforms and genres
     const platformGenreContainer = document.createElement('div');
     platformGenreContainer.classList.add('platform-genre-container');
 
@@ -221,31 +286,4 @@ function renderGameData(cover, screenshots, title, genres, description, date, pl
     platformGenreContainer.appendChild(platformContainer);
 
     topInfoContainer.appendChild(platformGenreContainer);
-
-    const addButton = document.createElement('button');
-    addButton.innerHTML = `Add`;
-    addButton.classList.add('add-button');
-    buttonContainer.appendChild(addButton);
-    addButton.addEventListener('click', () => {
-        addButton.classList.add('hidden');
-        removeButton.classList.remove('hidden');
-        addGame(gameId, title);
-    });
-
-    const removeButton = document.createElement('button');
-    removeButton.innerHTML = `Remove`;
-    removeButton.classList.add('remove-button');
-    buttonContainer.appendChild(removeButton);
-    removeButton.addEventListener('click', () => {
-        removeButton.classList.add('hidden');
-        addButton.classList.remove('hidden');
-        removeGame(gameId);
-    });
-
-    if (hasGame) { 
-        addButton.classList.add('hidden'); 
-    }
-    else { 
-        removeButton.classList.add('hidden');
-    }
 }

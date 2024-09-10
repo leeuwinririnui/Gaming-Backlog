@@ -1,9 +1,10 @@
-// Divide list of games into chuncks of specified size
+// Divide list of games into chunks of specified size
 export const divideList = (games, chunk) => {
     let divided = [];
     let temp = { games: [] };
     let count = 0;
 
+    // Iterate through each game and push chunk to divided when specified chunk size is reached
     games.forEach(game => {
         if (count === chunk) {
             divided.push(temp);
@@ -14,30 +15,32 @@ export const divideList = (games, chunk) => {
         count++;
     });
 
+    // Push leftover chunk
     divided.push(temp);
     
     return divided;
 }
 
-// Add game by ID to users list
+// Add game by ID to user's list
 export async function addGame(gameId, gameTitle) {
+    // Send POST request to server to add game by ID
     const res = await fetch(`api/game/add?id=${gameId}&title=${gameTitle}`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' }
     });
     
-    const data = await res.json();
+    const data = await res.json(); // Parse the response as JSON
 
+    // Log error message if response was not successful
     if (!res.ok) {
         console.error(data.message);
         return;
     }
-    
-    console.log(data.message);
 }
 
-// Remove game by ID from users list
+// Remove game by ID from user's list
 export async function removeGame(gameId) {
+    // Send GET request to the server to remove the game by ID
     const res = await fetch(`api/game/remove?id=${gameId}`, {
         method: 'GET',
         headers: { 'content-type': 'application/json' }
@@ -49,11 +52,11 @@ export async function removeGame(gameId) {
         console.error(data.message);
         return;
     }
-    console.log(data.message);
 }
 
-// Redirect user to game info page
+// Redirect user to game info page based on game ID
 export function gamePage() {
+    // Functon to handle the redirection when a game is clicked
     const handleRedirect = event => {
         const gameId = event.target.dataset.gameId;
         window.location.href = `/game?id=${gameId}`;
@@ -61,15 +64,17 @@ export function gamePage() {
 
     const gameElements = document.querySelectorAll('.title, .game-cover');
 
+    // Add click event listeners to each game element
     gameElements.forEach(element => {
         element.addEventListener('click', handleRedirect);
     });
 }
 
-// Add siblings to current pagination link
+// Add sibling classes to current pagination link
 export function handleSiblings(pagination, container, index, length) {
     const links = container.querySelectorAll('a');
 
+    // Remove sbiling and active classes from all links
     links.forEach(link => {
         link.classList.remove('sibling');
         link.classList.remove('active');
@@ -77,6 +82,7 @@ export function handleSiblings(pagination, container, index, length) {
 
     pagination.classList.add('active');
     
+    // Function to add sibling classes to pagination links
     const addSibling = (startLink, direction, count) => {
         let sibling = startLink;
         for (let i = 0; i < count; i++) {
@@ -86,6 +92,7 @@ export function handleSiblings(pagination, container, index, length) {
         }
     }
 
+    // Determine siblings based on index of active link
     if (index === 0) {
         addSibling(pagination, 'next', 4);
     } else if (index === 1) {
@@ -104,7 +111,7 @@ export function handleSiblings(pagination, container, index, length) {
     hideLinks(links);
 }
 
-// Hide pagination links
+// Hide pagination links that are not active or siblings
 export function hideLinks(links) {
     links.forEach(link => {
         link.style.display = link.classList.contains('active') || link.classList.contains('sibling')

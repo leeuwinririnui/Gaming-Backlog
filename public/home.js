@@ -1,4 +1,4 @@
-
+// Initialize document using DOMContentLoaded event
 document.addEventListener('DOMContentLoaded', async () => {
     document.querySelector('#loader').classList.remove('hidden');
     document.querySelector('#random-label').innerHTML = `Loading...`;
@@ -9,11 +9,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelector('#loader').classList.add('hidden');
 });
 
-// Redirect user to search page when search made
+// Redirect user to search page when search is made
 function toSearchPage() {
     const searchInput = document.querySelector('#search-game');
     const searchButton = document.querySelector('#search-button');
 
+    // Function to redirect user to search page with game title as a parameter
     const handleSearch = async () => {
         const game = searchInput.value.trim();
 
@@ -21,10 +22,12 @@ function toSearchPage() {
         
         window.location.href = `/search?title=${game}`;
     }
-
+    // Add click event listener to search button
     searchButton.addEventListener('click', () => {
         handleSearch();
     });
+
+    // Add 'Enter' key event listener to search input
     searchInput.addEventListener('keypress', event => {
         if (event.key === 'Enter') {
             event.preventDefault();
@@ -33,6 +36,7 @@ function toSearchPage() {
     });
 }
 
+// Fetches and displays username in the welcome header
 async function fetchUsername() {
     const header = document.getElementById('welcome');
     
@@ -44,8 +48,10 @@ async function fetchUsername() {
 
         const data = await res.json();
 
+        // Log error if response unsuccessful 
         if (!res.ok) {
-            throw new error(data.message);
+            console.log(data.message);
+            return;
         }
         
         header.textContent += ` ${data.username}!`;
@@ -54,9 +60,10 @@ async function fetchUsername() {
     }
 }
 
-// Fetch games based on type paramete (genre, popularity, etc...)
+// Fetch random games from API and display them
 async function fetchGames() {
     try {
+        // Fetch random games data from the API
         const res = await fetch(`api/game/random`, {
             method: 'GET',
             headers: { 'content-type': 'application/json' }
@@ -64,49 +71,57 @@ async function fetchGames() {
 
         const data = await res.json();
 
+        // Log error if response unsuccessful 
         if (!res.ok) {
-            throw new error(data.message);
+            console.log(data.message);
+            return;
         }
 
-        fillRecent(data.games);
+        fillRandom(data.games);
     } catch (error) {
         console.log(error);
     }
 }
 
-function fillRecent(games) {
+// Fills the page with random games 
+function fillRandom(games) {
     if (games) {
         const mainContainer = document.querySelector('.main-container');
 
-        // Create section for games
+        // Function to create section for a chunk of games
         const createGameSection = (gameChunk) => {
 
-            // Recent game container
+            // Create container for game chunk
             const randomGameContainer = document.createElement('div');
             randomGameContainer.classList.add('random-container');
             mainContainer.appendChild(randomGameContainer);
+
+            // Iterate over each game in the chunk and create display elements
             gameChunk.forEach(game => {
                 // Extract game data
                 let data = extractData(game);
 
                 if (data.gameCover) {     
-
-                    // Create container element for each individual game
+                    // Create container element for game display
                     const randomFrame = document.createElement('div');
                     randomFrame.classList.add('random-frame');
                     randomGameContainer.appendChild(randomFrame);
 
-                    // Create and append a blurred version of game cover for background
-
                     // Create and append game image cover element
+                    const randomImageContainer = document.createElement('div');
+                    randomImageContainer.classList.add('random-image-container');
+                    randomFrame.appendChild(randomImageContainer);
+
                     const randomGameImage = document.createElement('img');
                     randomGameImage.classList.add('random-image');
                     randomGameImage.src = data.gameCover;
-                    randomFrame.appendChild(randomGameImage);
+                    randomImageContainer.appendChild(randomGameImage);
 
+                    // Create container for title and score
                     const scoreTitleContainer = document.createElement('div');
                     scoreTitleContainer.classList.add('score-title-container')
                     randomFrame.appendChild(scoreTitleContainer);
+
                     // Create and append title element
                     const titleContainer = document.createElement('div');
                     const gameTitle = document.createElement('p');
@@ -141,7 +156,8 @@ function fillRecent(games) {
             });
         }
 
-        const chunkSize = 10;
+        // Divide games into chunks of specified size and create sections for each chunk
+        const chunkSize = 5;
             for (let i = 0; i < games.length; i += chunkSize) {
                 const gameChunk = games.slice(i, i + chunkSize);
                 createGameSection(gameChunk);
@@ -152,7 +168,7 @@ function fillRecent(games) {
 // Extract game data
 function extractData(game) {
     // Default data attributes
-    let gameCover;
+    let gameCover = 'images/nocover.png';
     let gameTitle = 'Untitled Game';
     let gameId = 'N/A';
     let mobyScore = 'N/A';
@@ -189,6 +205,7 @@ function extractData(game) {
     }
 }
 
+// Fucntion to handle redirection to game info page
 function handleRedirect(id, title, cover) {
     title.addEventListener('click', () => {
         window.location.href = `/game?id=${id}`;

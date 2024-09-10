@@ -1,15 +1,9 @@
 require('dotenv').config();
+
 const path = require('path');
 const express = require('express');
 const http = require('http');
 const cookieParser = require('cookie-parser');
-const cron = require('node-cron');
-const { bestCurrentYear } = require('./src/controllers/scrape.js');
-
-// // Schedule tasks
-// cron.schedule('0 0 * * *', () => {
-//     bestCurrentYear();
-// })
 
 // Create an Express application
 const app = express();
@@ -46,7 +40,7 @@ const server = http.createServer(app);
 // Start server
 server.listen(8080, () => {
     if (process.env.ENV === 'development') {
-    console.log('Server is running on http://localhost:8080');
+        console.log('Server is running on http://localhost:8080');
     }
 });
 

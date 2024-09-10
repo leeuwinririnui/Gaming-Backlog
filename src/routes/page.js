@@ -3,6 +3,8 @@ const path = require('path');
 const { userAuth, verifyAuth } = require('../middleware/auth');
 const router = express.Router();
 
+// Define routes for serving HTML
+
 router.get('/', userAuth, (req, res) => {
     res.sendFile(path.join(__dirname, '..', '..', 'views', 'home.html'));
 });

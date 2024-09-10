@@ -5,19 +5,22 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET;
 const { generateToken } = require('../util.js');
 
-// Register and store user information in db
+// Register and store user information in database
 const register = async (req, res, next) => {
     const { username, password } = req.body;
 
+    // Validate password length
     if (password.length < 8) {
         return res.status(400).json({ 
             message: "Password cannot be less than 8 characters" 
         });
     }
 
+    // Hash password for secure storage
     const hashPassword = await bcrypt.hash(password, 10);
 
     try {
+        // Chekc if user already exists
         const existingUser = await User.findOne({ username });
         if (existingUser) {
             console.log("User already exists");
@@ -26,18 +29,21 @@ const register = async (req, res, next) => {
             });
         }
 
+        // Create new user with hashed password
         const user = await User.create({
             username,
             password: hashPassword,
         });
 
+        // Generate JWT token for the user
         const token = generateToken(user);
 
+        // Set JWT token in a cookie
         res.cookie("jwt", token, {
             httpOnly: true,
             maxAge: 4 * 60 * 60  * 1000,
         });
-
+        
         res.status(200).json({
             message: "User successfully created",
             username: user,
@@ -51,10 +57,11 @@ const register = async (req, res, next) => {
     }
 }
 
-// Log user in with jwt token
+// Log user in with JWT token
 const login = async (req, res, next) => {
     const { username, password } = req.body
 
+    // Check if username and password are provided
     if (!username || !password) {
         return res.status(400).json({
             message: "Username or password not present",
@@ -62,8 +69,10 @@ const login = async (req, res, next) => {
     }
 
     try {
+        // Find user by username
         const user = await User.findOne({ username });
 
+        // Return error if User was not found
         if (!user) {
             return res.status(401).json({
                 message: "Login not successful",
@@ -71,6 +80,7 @@ const login = async (req, res, next) => {
             });
         } 
 
+        // Compare provided password with stored hash
         const match = await bcrypt.compare(password, user.password);
 
         if (!match) {
@@ -80,6 +90,7 @@ const login = async (req, res, next) => {
             });
         }
 
+        // Generate JWT token for user
         const token = generateToken(user);
 
         res.cookie("jwt", token, {
@@ -104,12 +115,14 @@ const login = async (req, res, next) => {
 const update = async (req, res, next) => {
     const { role, id } = req.body;
     
+    // Check if role and id are provided
     if (!role || !id ) {
         return req.status(400).json({ 
             message: "Request missing role or id" 
         });
     }
 
+    // Only allow role update to 'admin'
     if (role !== "admin") {
         return req.status(400).json({ 
             message: "Role is not admin" 
@@ -117,6 +130,7 @@ const update = async (req, res, next) => {
     }
 
     try {
+        // Find the user by id
         const user = await User.findById(id);
         
         if (!user) {
@@ -125,14 +139,15 @@ const update = async (req, res, next) => {
             });
         }
 
+        // Check if user is already an admin
         if (user.role === "admin") {
             return res.status(400).json({ 
                 message: "User is already an Admin" 
             });
         }
 
+        // Update user's role
         user.role = role;
-
         const updatedUser = await user.save();
 
         res.status(201).json({ 
@@ -148,18 +163,21 @@ const update = async (req, res, next) => {
     }
 }
 
-// Delete user from db
+// Delete user from database
 const deleteUser = async (req, res, next) => {
     const { id } = req.body;
 
     try {
+        // Find the user by id
         const user = await User.findById(id);
-
+        
         if (!user) {
             return res.status(404).json({ 
                 message: "User not found" 
             });
         }
+
+        // Delete user
         await user.deleteOne();
 
         res.status(201).json({ 
@@ -175,7 +193,7 @@ const deleteUser = async (req, res, next) => {
     }
 }
 
-// Authorise admin
+// Authorise admin based on JWT token
 const adminAuth = (req, res, next) => {
     const token = req.cookies.jwt;
 
@@ -197,7 +215,7 @@ const adminAuth = (req, res, next) => {
     }
 }
 
-// Authorise user
+// Authorise user based on JWt token
 const userAuth = (req, res, next) => {
     const token = req.cookies.jwt;
 
@@ -224,7 +242,7 @@ const userAuth = (req, res, next) => {
     }
 }
 
-// Check whether user is logged in
+// Check whether user is logged in and redirect if so
 const verifyAuth = (req, res, next) => {
     const token = req.cookies.jwt;
 

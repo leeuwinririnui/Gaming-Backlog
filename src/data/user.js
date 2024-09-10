@@ -1,5 +1,6 @@
 const Mongoose = require("mongoose");
 
+// Define schema for User model
 const UserSchema = new Mongoose.Schema({
     username: {
         type: String, 
@@ -25,11 +26,19 @@ const UserSchema = new Mongoose.Schema({
             title: {
                 type: String,
                 required: true,
+            },
+            status: {
+                type: String,
+                enum: ['completed', 'on hold', 'playing'],
+                required: true,
+                default: 'playing'
             }
         }
     ], 
 });
 
+// Create the User model using the defined schema
 const User = Mongoose.model("User", UserSchema);
 
+// Export User model
 module.exports = User;

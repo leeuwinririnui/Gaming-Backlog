@@ -155,7 +155,7 @@ strong {
     color: black;
 }
 
-/* Nav section */
+/* ------------------------------------ NAV SECTION ------------------------------------ */
 
 nav {
     display: flex;
@@ -382,9 +382,18 @@ input[type=search] {
     cursor: pointer;
 }
 
-.random-image {
-    width: 100%;
+.random-image-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     height: 90%;
+    overflow: hidden;
+}
+
+.random-image {
+    max-width: 100%;
+    aspect-ratio: 16 / 9;
     object-fit: cover; 
     object-position: center; 
     border-radius: 4px;
@@ -397,7 +406,8 @@ input[type=search] {
     align-items: start;
     justify-content: start;
     height: 10%;
-    width: 100%;
+    width: 90%;
+
 }
 
 .home-title-container {
@@ -483,7 +493,22 @@ input[type=search] {
     font-weight: var(--font-weight-normal);
 }
 
-/* Game listing */
+.list-status-container {
+    width: 6em;
+}
+
+.list-status {
+    width: 100%;
+    font-size: var(--font-size-xsmall);
+    padding: 0.2em 0;
+    background-color: var(--color-off-white);
+    border: 1px solid var(--dark-gray-accent);
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+}
+
+/* ----------------------- GAME LISTING SECTION ----------------------- */
 .games-list {
     height: auto;
 }
@@ -501,7 +526,6 @@ input[type=search] {
 }
 
 .cover-container {
-    /* border: 2px solid red; */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -511,7 +535,6 @@ input[type=search] {
     overflow: hidden;
     box-sizing: border-box;
 }
-
 
 .game-cover {
     width: 80%; 
@@ -536,12 +559,10 @@ input[type=search] {
     padding: 0 0.65em;
     height: 80%;
     width: 50%;
-    /* border: 2px solid red; */
 }
 
 .game-page {
     display: flex;
-    /* border: 2px solid red; */
     width: 100%;
 }
 
@@ -552,7 +573,6 @@ input[type=search] {
     white-space: nowrap;
     overflow: hidden; 
     text-overflow: ellipsis; 
-    /* border: 2px solid blue; */
     width: 100%
 }
 
@@ -563,7 +583,6 @@ input[type=search] {
 
 .date-container {
     display: flex;
-    /* border: 2px solid red; */
     width: 100%;
 }
 
@@ -572,7 +591,6 @@ input[type=search] {
     white-space: nowrap;
     overflow: hidden; 
     width: 100%;
-    /* border: 2px solid blue; */
     text-overflow: ellipsis; 
 }
 
@@ -590,7 +608,6 @@ input[type=search] {
 .button-container {
     display: flex;
     width: 50%;
-    /* border: 2px solid red; */
     margin-top: auto;
 }
 
@@ -638,7 +655,6 @@ input[type=search] {
     height: 100%;
     width: 20%;
 
-    /* border: 2px solid red; */
 }
 
 .score {
@@ -647,7 +663,6 @@ input[type=search] {
     font-weight: var(--font-weight-semi-bold);
     border-radius: 4px;
     color: var(--color-off-white);
-    /* border: 2px solid red; */
 }
 
 .pagination {
@@ -680,9 +695,9 @@ input[type=search] {
 }
 
 
-/* Footer Section */
+/* -------------------------------- FOOTER SECTION -------------------------------- */
 footer {
-    height: 16em;
+    height: 20em;
     background-color: var(--alternative-dark-bg);
     font-family: 'Roboto', sans-serif;
     color: var(--color-off-white);
@@ -696,7 +711,7 @@ footer {
     gap: 1em;
     background-color: var(--alternative-dark-bg);
     height: 100%;
-    padding: 2em;
+    padding: 2em 0;
     --max-width: 1110px;
     --padding: 1rem;
 
@@ -714,7 +729,6 @@ footer {
     height: 100%;
     width: 100%;
     padding: 0 2em 0 0;
-    /* border: 2px solid red; */
 }
 
 .footer-lists {
@@ -726,7 +740,6 @@ footer {
     height: 100%;
     width: 100%;
     padding: 0 2em 0 0;
-    /* border: 2px solid red; */
 }
 
 .footer-links {
@@ -783,7 +796,7 @@ footer a:hover {
     }
 }
 
-/* Game Page Section */
+/* ------------------- GAME PAGE SECTION ---------------*/
 
 /* Tablet styles (768px to 1024px) */
 @media (min-width: 768px) {
@@ -820,7 +833,6 @@ footer a:hover {
     min-height: 90vh;
     padding: 2em 0;
 
-    /* border: 2px solid blue; */
     --max-width: 1110px;
     --padding: 1rem;
 
@@ -832,7 +844,6 @@ footer a:hover {
 }
 
 .top-container {
-    /* border: 2px solid blue; */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -865,11 +876,9 @@ footer a:hover {
     height: 100%;
     gap: 1em;
     width: 100%;
-    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
 }
 
 .game-title-container {
-    /* border: 2px solid red; */
     display: flex;
     width: 100%;
     justify-content: center;
@@ -902,7 +911,6 @@ footer a:hover {
 .page-genre-container {
     display: flex;
     flex-direction: column;
-    /* border: 2px solid red; */
     width: 50%;
     gap: 0.5em;
 }
@@ -920,13 +928,29 @@ footer a:hover {
 .platform-container {
     display: flex;
     flex-direction: column;
-    /* border: 2px solid red; */
     width: 50%;
     gap: 0.5em;
 }
 
 .platform {
     font-size: var(--font-size-small);
+}
+
+.status-container {
+    align-self: center;
+    width: 8em;
+}
+
+.status {
+    appearance: none;
+    width: 100%;
+    font-size: var(--font-size-small);
+    padding: 0.6em 0;
+    background-color: var(--color-off-white);
+    border: 1px solid var(--dark-gray-accent);
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
 }
 
 .description-label-container {
@@ -958,9 +982,8 @@ footer a:hover {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: start;
+    align-items: center;
     width: 100%;
-    /* border: 2px solid red; */
 }
 
 .screenshot-container {
@@ -970,8 +993,6 @@ footer a:hover {
     max-width: 100%;
     overflow-x: auto;
     height: 15em;
-    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
-    /* border: 2px solid red; */
 }
 
 /* Temp */
@@ -1011,7 +1032,7 @@ footer a:hover {
     }
 }
 
-/* FORM SECTION */
+/* ----------------------- FORM SECTION ----------------------- */
 /* Main container */
 .main-container-form {
     display: flex;

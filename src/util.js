@@ -2,7 +2,8 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET;
 var stringSimilarity = require("string-similarity");
 
-// Match games from users list with title from search 
+// Match games from users list with a search title
+// Returns an array of titles that have a similarity score greater than 0.25
 function matchTitles(gameTitles, title) {
     let titles = [];
 
@@ -15,7 +16,8 @@ function matchTitles(gameTitles, title) {
     return titles;
 }
 
-// Match games using id 
+// Match games using their IDs
+// Returns an array of games whose IDs are included in the provided list of IDs
 function matchIds(games, ids) {
     let match = [];
 
@@ -28,7 +30,8 @@ function matchIds(games, ids) {
     return match;
 }
 
-// Filter users games by matching with title parameter
+// Filter users games by matching titles
+// Returns an object with a 'games' property
 function filterGamesByTitle(games, titles) {
     let filtered_games = { games: [] };
         
@@ -41,7 +44,8 @@ function filterGamesByTitle(games, titles) {
     return filtered_games;
 }
 
-// Generate token
+// Generate a JWT token for user
+// Token expires in 4 hours
 function generateToken(user) {
     const token = jwt.sign(
         { id: user.id, username: user.username, role: user.role },

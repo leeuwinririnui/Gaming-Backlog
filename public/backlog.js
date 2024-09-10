@@ -11,38 +11,49 @@ let currentList;
 let allGameIds;
 let page = 0;
 let gameCount = 0;
+let filter = 'show all'
 
-// Initialize page 
+// Initialize page on DOMContentLoaded event
 document.addEventListener('DOMContentLoaded', async () => {
+    setupFilter();
     document.querySelector('#search-game').value = "";
     await getUserList();
     setupSearch();
     addPaginationLinks(gameCount);
 });
 
-// Handle search functionality
+// Set up search functionality
 function setupSearch() {
     const searchInput = document.querySelector('#search-game');
     const searchButton = document.querySelector('#search-button');
 
+    // Function to search for games based on user input
     const searchList = async () => {
         if (searchInput.value.trim() == "") {
             return;
         }
+
         document.querySelector('#loader').classList.remove('hidden');
         document.querySelector('#search-results').innerHTML = `Searching...`;
-        // Set active page to first (0) for each new search
+
+        // Reset to first page on each new search
         page = 0;
-        // Ensure all users games are retrieved before adding links
+        
+        // Fetch user's list of games and update pagination
         await getUserList(searchInput.value.trim());
         addPaginationLinks(gameCount, searchInput.value.trim());
+
+        // Display search results text
         document.querySelector('#search-results').innerHTML = `Search results for <strong>"${searchInput.value.trim()}"<strong>`
         document.querySelector('#loader').classList.add('hidden');
     }
 
+    // Add event listener to search button
     searchButton.addEventListener('click', () => {
         searchList();
     });
+
+    // Add event listener to trigger search on pressing Enter key
     searchInput.addEventListener('keypress', event => {
         if (event.key === 'Enter') {
             event.preventDefault();
@@ -51,26 +62,29 @@ function setupSearch() {
     });
 }
 
-// Retrieve users list of games
+// Retrieve users list of games from server
 async function getUserList(title) {
     const gamesList = document.querySelector('#games-list');
+    const encodedFilter = encodeURIComponent(filter);
 
     try {
-        // Users list will be filtered if title is passed
-        const res = await fetch(`api/game/backlog?page=${page}&title=${title}`, {
+        // Make API request to fetch user's game list
+        const res = await fetch(`api/game/backlog?page=${page}&title=${title}&filter=${encodedFilter}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json'}
         });
 
-        if (!res.ok) throw new Error('Failed to retrieve game data');
-
         const data = await res.json();
 
-        // Update current list with newly retrieved data
+        // Log error message if response is not okay
+        if (!res.ok) {
+            console.log(data.message);
+            return;
+        }
+
+        // Update state variables with fetched data
         currentList = data.games;
-        // Round up to ensure all games are covered
         gameCount = Math.ceil(data.gameCount); 
-        // Could come in handy
         allGameIds = data.gameIds
 
         populateList(currentList, gamesList);
@@ -82,21 +96,22 @@ async function getUserList(title) {
     }
 }
 
-// Add papgination links
+// Add papgination links based on total number of games
 function addPaginationLinks(length, title) {
-    console.log("Pagination links:", length);
     const paginationContainer = document.querySelector('.pagination');
-    paginationContainer.innerHTML = '';
+    paginationContainer.innerHTML = ''; // Clear existing links
 
+    // Create pagination links based on the total number of pages
     for (let i = 0; i < length; i++) {
         const paginationLink = document.createElement('a');
         paginationLink.innerHTML = `${i+1}`;
         
-        // Initial pagination setup 
+        // Initial link states
         if (page === 0 && i === 0) { 
             paginationLink.classList.add('active'); 
         } 
 
+        // Handle siblings
         if (page === 0 && i >= 1 && i <= 4) { 
             paginationLink.classList.add('sibling');
         }
@@ -114,7 +129,7 @@ function addPaginationLinks(length, title) {
     hideLinks(paginationContainer.querySelectorAll('a'));
 }
 
-// Populate users list with game elements
+// Populate game list with game elements
 function populateList(games, list) {
     list.innerHTML = '';
     const fragment = document.createDocumentFragment();
@@ -123,11 +138,11 @@ function populateList(games, list) {
         // Extract data from game object
         const data = extractData(game)
 
-        // Create new game element
+        // Create main game element container
         const gameElement = document.createElement('div');
         gameElement.classList.add('game');  
         
-        // Create elements for game cover 
+        // Create and append cover container with game cover image
         const coverContainer = document.createElement('div');
         const cover = document.createElement('img');
         coverContainer.classList.add('cover-container');
@@ -137,7 +152,7 @@ function populateList(games, list) {
         coverContainer.appendChild(cover);
         gameElement.appendChild(coverContainer);
         
-        // Create elements for game title
+        // Create and append release title container
         const titleContainer = document.createElement('div');
         const title = document.createElement('p');
         titleContainer.classList.add('title-container')
@@ -146,7 +161,7 @@ function populateList(games, list) {
         title.dataset.gameId = String(data.gameId);
         titleContainer.appendChild(title)
 
-        // Create elements for game release date
+        // Create and append date container
         const dateContainer = document.createElement('div');
         const date = document.createElement('p');
         dateContainer.classList.add('date-container');
@@ -154,6 +169,7 @@ function populateList(games, list) {
         date.innerHTML = `Released: <strong>${data.releaseDate}</strong>`;
         dateContainer.appendChild(date);
 
+        // Create and append genre container
         const genreContainer = document.createElement('div');
         const genre = document.createElement('p');
         genreContainer.classList.add('genre-container');
@@ -166,7 +182,7 @@ function populateList(games, list) {
         });
         genreContainer.appendChild(genre);
         
-        // Create remove and add button elements
+        // Create and append button container with add and remove buttons
         const buttonContainer = document.createElement('div');
         const remove = document.createElement('button');
         const add = document.createElement('button');
@@ -174,7 +190,7 @@ function populateList(games, list) {
         remove.classList.add('remove-button');
         remove.textContent = 'Remove';
         add.classList.add('add-button');
-        add.classList.add('hidden');
+        add.classList.add('hidden'); // Hide add button by default
         add.textContent = 'Add';
         buttonContainer.appendChild(remove);
         buttonContainer.appendChild(add);
@@ -191,7 +207,7 @@ function populateList(games, list) {
             addGame(data.gameId, data.gameTitle);
         });
 
-        // Create info container and append game elements
+        // Create info container and append title, date, genre, and buttons
         const infoContainer = document.createElement('div');
         infoContainer.classList.add('game-info');
         infoContainer.appendChild(titleContainer);
@@ -200,12 +216,14 @@ function populateList(games, list) {
         infoContainer.appendChild(buttonContainer);
         gameElement.appendChild(infoContainer);
         
-        // Create score elements
+        // Create and append score container
         const scoreContainer = document.createElement('div');
         const score = document.createElement('p');
         scoreContainer.classList.add('score-container');
         score.classList.add('score');
         if (data.mobyScore != 'N/A') score.innerHTML = `${data.mobyScore * 10}`
+
+        // Add classes based on score to visually differentiate ratings
         if (data.mobyScore >= 7.5) {
             scoreContainer.classList.add('good');
         } 
@@ -218,18 +236,19 @@ function populateList(games, list) {
         scoreContainer.appendChild(score);
         gameElement.appendChild(scoreContainer);
         
-        // Append to document fragment
+        // Append game element to fragment
         fragment.appendChild(gameElement);
     });
 
+    // Append fragment to main game list container
     list.appendChild(fragment);
 } 
 
 
-// Extract game data
+// Extract relevant game data
 function extractData(game) {
     // Default data attributes
-    let gameCover = 'default-cover.jpg'; // FIND AN IMAGE TO USE AS DEFAULT
+    let gameCover = 'images/nocover.png'; // FIND AN IMAGE TO USE AS DEFAULT
     let gameTitle = 'Untitled Game';
     let gameId = 'N/A';
     let mobyScore = 'N/A';
@@ -264,4 +283,17 @@ function extractData(game) {
         releaseDate: releaseDate,
         genres: genres  
     }
+}
+
+// Set up filter dropdown and handle change events
+async function setupFilter() {
+    const selectElement = document.querySelector('.list-status');
+
+    selectElement.addEventListener('change', async (event) => {
+        filter = event.target.value;
+        console.log(filter);
+        page = 0;
+        await getUserList();
+        addPaginationLinks(gameCount);       
+    });
 }

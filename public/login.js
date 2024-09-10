@@ -1,14 +1,11 @@
-// Function to register are user based on details from register form
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('form');
 
+    // Login user based on details from login form
     form.addEventListener('submit', async (e) => {
         const username = document.querySelector('#username');
         const password = document.querySelector('#password');
         const display = document.querySelector('#error');
-
-        console.log(`${username.value}`);
-        console.log(`${password.value}`);
 
         e.preventDefault();
 
@@ -27,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Handle errors
             if (res.status === 400 || res.status === 401) {
+                console.log(data.message);
                 display.textContent = `${data.message}. `;
                 if (data.error) { 
                     display.textContent += `${data.error}`; 
@@ -41,6 +39,5 @@ document.addEventListener('DOMContentLoaded', () => {
             display.textContent = 'An unexpected error occurred. Please try again.';
             console.log(err.message);
         }
-
     });
 });

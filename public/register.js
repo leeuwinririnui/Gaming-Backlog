@@ -1,17 +1,13 @@
-// Function to register are user based on details from register form
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('form');
 
+    // Register user based on details from register form
     form.addEventListener('submit', async (event) => {
         // Retrieve user info
         const username = document.querySelector('#username');
         const password = document.querySelector('#password');
         const confirm = document.querySelector('#confirm-password');
         const display = document.querySelector('#error');
-
-        console.log(`Username: ${username.value}`);
-        console.log(`Password: ${password.value}`);
-        console.log(`Confirm Password: ${confirm.value}`);
 
         event.preventDefault();
 
@@ -36,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Handle errors
             if (!res.ok) {
+                console.log(data.message);
                 display.textContent = `${data.message}`;
                 if (data.error) { 
                     display.textContent += `${data.error}`; 
